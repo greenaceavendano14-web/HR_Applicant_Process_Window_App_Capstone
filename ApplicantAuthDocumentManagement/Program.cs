@@ -12,6 +12,8 @@ namespace ApplicantAuthDocumentManagement
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
+
+        // testing git connection
         static void Main()
         {
             Application.EnableVisualStyles();
