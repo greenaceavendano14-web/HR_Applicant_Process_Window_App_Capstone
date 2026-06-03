@@ -1,0 +1,253 @@
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp1
+{
+    public partial class JobVacancies : Form
+    {
+        private void dgvJobs_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                string jobID = dgvJobs.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                if (jobID == "J001")
+                {
+                    lblPosition.Text = "Position: Software Developer";
+                    lblDepartment.Text = "Department: IT";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: BSIT/BSCS Graduate";
+                    lblDocuments.Text = "Required Documents: Resume, TOR";
+                }
+                else if (jobID == "J002")
+                {
+                    lblPosition.Text = "Position: HR Assistant";
+                    lblDepartment.Text = "Department: HR";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: HRM Graduate";
+                    lblDocuments.Text = "Required Documents: Resume, Diploma";
+                }
+                else if (jobID == "J003")
+                {
+                    lblPosition.Text = "Position: Accountant";
+                    lblDepartment.Text = "Department: Finance";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: CPA Preferred";
+                    lblDocuments.Text = "Required Documents: Resume, PRC License";
+                }
+            }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            string search = txtSearch.Text.ToLower();
+
+            foreach (DataGridViewRow row in dgvJobs.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    string position = row.Cells[1].Value.ToString().ToLower();
+
+                    row.Visible = position.Contains(search);
+                }
+            }
+        }
+
+        public JobVacancies()
+        {
+            InitializeComponent();
+
+            dgvJobs.DefaultCellStyle.SelectionBackColor =
+               Color.FromArgb(230, 210, 235);
+            dgvJobs.DefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvJobs.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.Thistle;
+            dgvJobs.ColumnHeadersDefaultCellStyle.SelectionForeColor = Color.White;
+            dgvJobs.RowHeadersDefaultCellStyle.SelectionBackColor = Color.Thistle;
+            dgvJobs.RowHeadersDefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvJobs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvJobs.MultiSelect = false;
+            btnApply.Click += btnApply_Click;
+            dgvJobs.CellClick += dgvJobs_CellClick;
+            dgvJobs.Rows.Add("J001", "Software Developer", "IT", "Full-Time", "Open");
+            dgvJobs.Rows.Add("J002", "HR Assistant", "HR", "Full-Time", "Open");
+            dgvJobs.Rows.Add("J003", "Accountant", "Finance", "Full-Time", "Open");
+            btnExit.Click += btnExit_Click;
+            btnSearch.Click += btnSearch_Click;
+            btnRefresh.Click += btnRefresh_Click;
+            dgvJobs.AllowUserToAddRows = false;
+            lblJobCount.Text = "Total Jobs: " + dgvJobs.Rows.Count;
+            dgvJobs.ReadOnly = true;
+            dgvJobs.AllowUserToDeleteRows = false;
+            dgvJobs.AllowUserToResizeRows = false;
+        }
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            if (dgvJobs.CurrentRow != null)
+            {
+                string jobID = dgvJobs.CurrentRow.Cells[0].Value.ToString();
+                string position = dgvJobs.CurrentRow.Cells[1].Value.ToString();
+
+                MessageBox.Show(
+                    "You have successfully applied for:\n\n" +
+                    jobID + " - " + position,
+                    "Application Submitted",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Please select a job first.");
+            }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            txtSearch.Clear();
+
+            foreach (DataGridViewRow row in dgvJobs.Rows)
+            {
+                row.Visible = true;
+            }
+        }
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+    }
+}
+
+
+//designer
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp1
+{
+    public partial class JobVacancies : Form
+    {
+        private void dgvJobs_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                string jobID = dgvJobs.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                if (jobID == "J001")
+                {
+                    lblPosition.Text = "Position: Software Developer";
+                    lblDepartment.Text = "Department: IT";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: BSIT/BSCS Graduate";
+                    lblDocuments.Text = "Required Documents: Resume, TOR";
+                }
+                else if (jobID == "J002")
+                {
+                    lblPosition.Text = "Position: HR Assistant";
+                    lblDepartment.Text = "Department: HR";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: HRM Graduate";
+                    lblDocuments.Text = "Required Documents: Resume, Diploma";
+                }
+                else if (jobID == "J003")
+                {
+                    lblPosition.Text = "Position: Accountant";
+                    lblDepartment.Text = "Department: Finance";
+                    lblType.Text = "Employment Type: Full-Time";
+                    lblQualifications.Text = "Qualifications: CPA Preferred";
+                    lblDocuments.Text = "Required Documents: Resume, PRC License";
+                }
+            }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            string search = txtSearch.Text.ToLower();
+
+            foreach (DataGridViewRow row in dgvJobs.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    string position = row.Cells[1].Value.ToString().ToLower();
+
+                    row.Visible = position.Contains(search);
+                }
+            }
+        }
+
+        public JobVacancies()
+        {
+            InitializeComponent();
+
+            dgvJobs.DefaultCellStyle.SelectionBackColor =
+               Color.FromArgb(230, 210, 235);
+            dgvJobs.DefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvJobs.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.Thistle;
+            dgvJobs.ColumnHeadersDefaultCellStyle.SelectionForeColor = Color.White;
+            dgvJobs.RowHeadersDefaultCellStyle.SelectionBackColor = Color.Thistle;
+            dgvJobs.RowHeadersDefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvJobs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvJobs.MultiSelect = false;
+            btnApply.Click += btnApply_Click;
+            dgvJobs.CellClick += dgvJobs_CellClick;
+            dgvJobs.Rows.Add("J001", "Software Developer", "IT", "Full-Time", "Open");
+            dgvJobs.Rows.Add("J002", "HR Assistant", "HR", "Full-Time", "Open");
+            dgvJobs.Rows.Add("J003", "Accountant", "Finance", "Full-Time", "Open");
+            btnExit.Click += btnExit_Click;
+            btnSearch.Click += btnSearch_Click;
+            btnRefresh.Click += btnRefresh_Click;
+            dgvJobs.AllowUserToAddRows = false;
+            lblJobCount.Text = "Total Jobs: " + dgvJobs.Rows.Count;
+            dgvJobs.ReadOnly = true;
+            dgvJobs.AllowUserToDeleteRows = false;
+            dgvJobs.AllowUserToResizeRows = false;
+        }
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            if (dgvJobs.CurrentRow != null)
+            {
+                string jobID = dgvJobs.CurrentRow.Cells[0].Value.ToString();
+                string position = dgvJobs.CurrentRow.Cells[1].Value.ToString();
+
+                MessageBox.Show(
+                    "You have successfully applied for:\n\n" +
+                    jobID + " - " + position,
+                    "Application Submitted",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Please select a job first.");
+            }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            txtSearch.Clear();
+
+            foreach (DataGridViewRow row in dgvJobs.Rows)
+            {
+                row.Visible = true;
+            }
+        }
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+    }
+}
