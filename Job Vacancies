@@ -132,6 +132,7 @@ namespace WindowsFormsApp1
     }
 }
 
+// Designer.cs
 
 using System.Drawing;
 using System.Windows.Forms;
