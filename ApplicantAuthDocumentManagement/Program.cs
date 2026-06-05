@@ -13,7 +13,7 @@ namespace ApplicantAuthDocumentManagement
         /// </summary>
         [STAThread]
 
-        // testing git connection
+       
         static void Main()
         {
             Application.EnableVisualStyles();
