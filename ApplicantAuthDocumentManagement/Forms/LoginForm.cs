@@ -77,5 +77,14 @@ namespace ApplicantAuthDocumentManagement.Forms
                 MessageBox.Show("Database connection error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void lnkRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            RegistrationForm register = new RegistrationForm();
+
+            register.Show();
+
+            this.Hide();
+        }
     }
 }

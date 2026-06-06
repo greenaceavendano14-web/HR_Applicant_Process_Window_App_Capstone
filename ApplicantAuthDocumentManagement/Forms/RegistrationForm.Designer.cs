@@ -74,7 +74,6 @@
             this.lblCompany.Size = new System.Drawing.Size(372, 36);
             this.lblCompany.TabIndex = 0;
             this.lblCompany.Text = "Apex Digital Solutions";
-            this.lblCompany.Click += new System.EventHandler(this.label1_Click);
             // 
             // pnlBackground
             // 
@@ -234,6 +233,7 @@
             this.btnRegister.TabIndex = 12;
             this.btnRegister.Text = "Register";
             this.btnRegister.UseVisualStyleBackColor = false;
+            this.btnRegister.Click += new System.EventHandler(this.btnRegister_Click);
             // 
             // lblMessage
             // 
