@@ -86,5 +86,24 @@ namespace ApplicantAuthDocumentManagement.Forms
 
             this.Hide();
         }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void chkShowPassword_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkShowPassword.Checked)
+            {
+                txtPassword.PasswordChar = '\0';
+                chkShowPassword.Text = "🙈";
+            }
+            else
+            {
+                txtPassword.PasswordChar = '•';
+                chkShowPassword.Text = "👁️";
+            }
+        }
     }
 }

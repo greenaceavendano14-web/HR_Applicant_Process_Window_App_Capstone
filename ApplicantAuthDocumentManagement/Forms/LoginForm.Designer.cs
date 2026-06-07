@@ -41,6 +41,8 @@
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblCompany = new System.Windows.Forms.Label();
             this.picLogo = new System.Windows.Forms.PictureBox();
+            this.btnExit = new System.Windows.Forms.Button();
+            this.chkShowPassword = new System.Windows.Forms.CheckBox();
             this.pnlBackround.SuspendLayout();
             this.pnlLogin.SuspendLayout();
             this.pnlHeader.SuspendLayout();
@@ -50,6 +52,7 @@
             // pnlBackround
             // 
             this.pnlBackround.BackColor = System.Drawing.Color.LavenderBlush;
+            this.pnlBackround.Controls.Add(this.btnExit);
             this.pnlBackround.Controls.Add(this.lnkRegister);
             this.pnlBackround.Controls.Add(this.pnlLogin);
             this.pnlBackround.Controls.Add(this.pnlHeader);
@@ -75,6 +78,7 @@
             // pnlLogin
             // 
             this.pnlLogin.BackColor = System.Drawing.Color.White;
+            this.pnlLogin.Controls.Add(this.chkShowPassword);
             this.pnlLogin.Controls.Add(this.lblError);
             this.pnlLogin.Controls.Add(this.lblLogin);
             this.pnlLogin.Controls.Add(this.lblEmail);
@@ -104,9 +108,9 @@
             this.lblLogin.ForeColor = System.Drawing.Color.DimGray;
             this.lblLogin.Location = new System.Drawing.Point(135, 20);
             this.lblLogin.Name = "lblLogin";
-            this.lblLogin.Size = new System.Drawing.Size(180, 31);
+            this.lblLogin.Size = new System.Drawing.Size(176, 30);
             this.lblLogin.TabIndex = 0;
-            this.lblLogin.Text = "Applicant Form";
+            this.lblLogin.Text = "Applicant Login";
             this.lblLogin.Click += new System.EventHandler(this.lblLogin_Click);
             // 
             // lblEmail
@@ -158,9 +162,9 @@
             this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPassword.Location = new System.Drawing.Point(40, 180);
             this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '•';
             this.txtPassword.Size = new System.Drawing.Size(370, 27);
             this.txtPassword.TabIndex = 4;
-            this.txtPassword.UseSystemPasswordChar = true;
             // 
             // pnlHeader
             // 
@@ -194,6 +198,31 @@
             this.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picLogo.TabIndex = 1;
             this.picLogo.TabStop = false;
+            // 
+            // btnExit
+            // 
+            this.btnExit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExit.Location = new System.Drawing.Point(25, 506);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(110, 35);
+            this.btnExit.TabIndex = 10;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // chkShowPassword
+            // 
+            this.chkShowPassword.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkShowPassword.AutoSize = true;
+            this.chkShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkShowPassword.Location = new System.Drawing.Point(405, 181);
+            this.chkShowPassword.Name = "chkShowPassword";
+            this.chkShowPassword.Size = new System.Drawing.Size(29, 26);
+            this.chkShowPassword.TabIndex = 11;
+            this.chkShowPassword.Text = "👁️";
+            this.chkShowPassword.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkShowPassword.UseVisualStyleBackColor = true;
+            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.chkShowPassword_CheckedChanged);
             // 
             // LoginForm
             // 
@@ -232,5 +261,7 @@
         private System.Windows.Forms.Label lblCompany;
         private System.Windows.Forms.Label lblLogin;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.CheckBox chkShowPassword;
     }
 }
