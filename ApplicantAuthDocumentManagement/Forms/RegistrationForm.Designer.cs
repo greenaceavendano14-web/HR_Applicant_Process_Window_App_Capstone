@@ -102,12 +102,13 @@
             // 
             this.lnkLogin.AutoSize = true;
             this.lnkLogin.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lnkLogin.Location = new System.Drawing.Point(351, 401);
+            this.lnkLogin.Location = new System.Drawing.Point(349, 410);
             this.lnkLogin.Name = "lnkLogin";
             this.lnkLogin.Size = new System.Drawing.Size(255, 20);
             this.lnkLogin.TabIndex = 1;
             this.lnkLogin.TabStop = true;
             this.lnkLogin.Text = "Already have an account? Login here.";
+            this.lnkLogin.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.lnkLogin.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkLogin_LinkClicked);
             // 
             // pnlRegister
