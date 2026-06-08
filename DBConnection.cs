@@ -1,50 +1,33 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
 using System.Data;
 
-namespace JobVacancyForm
+namespace ApplicationForm
 {
     public class DBConnection
     {
-        public MySqlConnection connection;
+        private MySqlConnection conn;
 
-        public DBConnection()
+        private string connectionString =
+            "server=localhost;port=3306;database=HR_ApplicantSystem;uid=root;pwd=KylaM@e123;";
+
+        public void OpenConnection()
         {
-            connection = new MySqlConnection(
-                "server=localhost;port=3306;database=HR_ApplicantSystem;uid=root;pwd=KylaM@e123;"
-            );
+            if (conn == null)
+                conn = new MySqlConnection(connectionString);
+
+            if (conn.State == ConnectionState.Closed)
+                conn.Open();
         }
 
-        // ================= OPEN CONNECTION =================
-        public void Open()
+        public MySqlConnection GetConnection()
         {
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                {
-                    connection.Open();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Connection Open Failed: " + ex.Message);
-            }
+            return conn;
         }
 
-        // ================= CLOSE CONNECTION =================
-        public void Close()
+        public void CloseConnection()
         {
-            try
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Connection Close Failed: " + ex.Message);
-            }
+            if (conn != null && conn.State == ConnectionState.Open)
+                conn.Close();
         }
     }
 }
