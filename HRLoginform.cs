@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
 
 namespace HRApplicantSystem
 {
@@ -65,36 +66,77 @@ namespace HRApplicantSystem
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
-                            {
-                                int userId =
-                                    Convert.ToInt32(reader["UserID"]);
-
-                                string role =
-                                    reader["RoleName"].ToString();
-
-                                string fullName =
-                                    reader["FirstName"].ToString() + " " +
-                                    reader["LastName"].ToString();
-
-                                HRDashboard dashboard =
-                                    new HRDashboard(
-                                        userId,
-                                        role,
-                                        fullName);
-
-                                dashboard.Show();
-
-                                this.Hide();
-                            }
-                            else
+                            if (!reader.Read())
                             {
                                 MessageBox.Show(
                                     "Invalid Email or Password",
                                     "Login Failed",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
+
+                                return;
                             }
+
+                            int userId =
+                                Convert.ToInt32(reader["UserID"]);
+
+                            string role =
+                                reader["RoleName"].ToString();
+
+                            string fullName =
+                                reader["FirstName"].ToString() + " " +
+                                reader["LastName"].ToString();
+
+                            reader.Close();
+
+                            // Save Session
+                            Session.UserID = userId;
+                            Session.FullName = fullName;
+                            Session.RoleName = role;
+
+                            // Audit Trail - Login
+                            MySqlCommand auditCmd =
+                                new MySqlCommand(
+                                @"INSERT INTO AuditTrail
+                                (
+                                    ActorType,
+                                    ActorID,
+                                    Action,
+                                    Details
+                                )
+                                VALUES
+                                (
+                                    @ActorType,
+                                    @ActorID,
+                                    'LOGIN',
+                                    @Details
+                                )",
+                                conn);
+
+                            auditCmd.Parameters.AddWithValue(
+                                "@ActorType",
+                                role);
+
+                            auditCmd.Parameters.AddWithValue(
+                                "@ActorID",
+                                userId);
+
+                            auditCmd.Parameters.AddWithValue(
+                                "@Details",
+                                fullName + " logged in.");
+
+                            auditCmd.ExecuteNonQuery();
+
+                            // Open Dashboard
+                            HRDashboard dashboard =
+                                new HRDashboard(
+                                    userId,
+                                    role,
+                                    fullName);
+
+                            dashboard.Show();
+
+                            this.Hide();
                         }
                     }
                 }
