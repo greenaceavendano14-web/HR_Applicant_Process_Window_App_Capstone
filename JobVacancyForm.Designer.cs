@@ -1,4 +1,4 @@
-﻿namespace JobVacancyForm
+namespace JobVacancyForm
 {
     partial class JobVacancyForm
     {
@@ -216,7 +216,7 @@
             this.Controls.Add(this.cmbStatus);
             this.Name = "JobVacancyForm";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.JobVacancyForm_Load_1);
+           
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
