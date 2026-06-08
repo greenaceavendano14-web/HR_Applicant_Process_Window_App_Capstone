@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows.Forms;
@@ -18,7 +18,7 @@ namespace JobVacancyForm
             dataGridView1.CellClick += dataGridView1_CellClick;
         }
 
-        // ================= FORM LOAD =================
+        // ================= LOAD =================
         private void JobVacancyForm_Load(object sender, EventArgs e)
         {
             LoadJobs();
@@ -37,10 +37,7 @@ namespace JobVacancyForm
             {
                 db.Open();
 
-                string query = @"
-                    SELECT VacancyID, JobTitle, JobDescription, Qualifications,
-                           SlotsAvailable, PostedDate, ClosingDate, Status
-                    FROM JobVacancies";
+                string query = "SELECT * FROM JobVacancies";
 
                 MySqlDataAdapter da = new MySqlDataAdapter(query, db.connection);
                 DataTable dt = new DataTable();
@@ -59,7 +56,7 @@ namespace JobVacancyForm
             }
         }
 
-        // ================= ADD =================
+        // ================= ADD (FIXED) =================
         private void ADD_Click(object sender, EventArgs e)
         {
             try
@@ -67,11 +64,10 @@ namespace JobVacancyForm
                 db.Open();
 
                 string query = @"
-                    INSERT INTO JobVacancies
-                    (DepartmentID, EmploymentTypeID, JobTitle, JobDescription, Qualifications,
-                     SlotsAvailable, PostedDate, CreatedByUserID, Status)
-                    VALUES
-                    (1, 1, @title, @desc, @qual, 1, CURDATE(), 1, @status)";
+                INSERT INTO JobVacancies
+                (JobTitle, JobDescription, Qualifications, SlotsAvailable, PostedDate, Status, CreatedByUserID)
+                VALUES
+                (@title, @desc, @qual, 1, CURDATE(), @status, 1)";
 
                 MySqlCommand cmd = new MySqlCommand(query, db.connection);
 
@@ -98,46 +94,37 @@ namespace JobVacancyForm
         // ================= SELECT =================
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            try
-            {
-                if (e.RowIndex < 0) return;
+            if (e.RowIndex < 0) return;
 
-                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+            DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-                selectedVacancyID = Convert.ToInt32(row.Cells["VacancyID"].Value);
-
-                txtJobTitle.Text = row.Cells["JobTitle"].Value?.ToString();
-                txtDescription.Text = row.Cells["JobDescription"].Value?.ToString();
-                txtRequirements.Text = row.Cells["Qualifications"].Value?.ToString();
-
-                cmbStatus.Text = row.Cells["Status"].Value?.ToString();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("SELECT ERROR: " + ex.Message);
-            }
+            selectedVacancyID = Convert.ToInt32(row.Cells["VacancyID"].Value);
+            txtJobTitle.Text = row.Cells["JobTitle"].Value?.ToString();
+            txtDescription.Text = row.Cells["JobDescription"].Value?.ToString();
+            txtRequirements.Text = row.Cells["Qualifications"].Value?.ToString();
+            cmbStatus.Text = row.Cells["Status"].Value?.ToString();
         }
 
-        // ================= UPDATE (FIXED & SAFE) =================
+        // ================= UPDATE =================
         private void UPDATE_Click(object sender, EventArgs e)
         {
             try
             {
-                if (selectedVacancyID <= 0)
+                if (selectedVacancyID == 0)
                 {
-                    MessageBox.Show("Please select a job first!");
+                    MessageBox.Show("Select a job first!");
                     return;
                 }
 
                 db.Open();
 
                 string query = @"
-                    UPDATE JobVacancies
-                    SET JobTitle=@title,
-                        JobDescription=@desc,
-                        Qualifications=@qual,
-                        Status=@status
-                    WHERE VacancyID=@id";
+                UPDATE JobVacancies
+                SET JobTitle=@title,
+                    JobDescription=@desc,
+                    Qualifications=@qual,
+                    Status=@status
+                WHERE VacancyID=@id";
 
                 MySqlCommand cmd = new MySqlCommand(query, db.connection);
 
@@ -147,14 +134,11 @@ namespace JobVacancyForm
                 cmd.Parameters.AddWithValue("@qual", txtRequirements.Text);
                 cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
 
-                int result = cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
                 db.Close();
 
-                if (result > 0)
-                    MessageBox.Show("Updated Successfully!");
-                else
-                    MessageBox.Show("Update failed (no matching record)");
+                MessageBox.Show("Updated Successfully!");
 
                 LoadJobs();
                 ClearFields();
@@ -170,21 +154,11 @@ namespace JobVacancyForm
         {
             try
             {
-                if (selectedVacancyID <= 0)
+                if (selectedVacancyID == 0)
                 {
-                    MessageBox.Show("Please select a job first!");
+                    MessageBox.Show("Select a job first!");
                     return;
                 }
-
-                DialogResult confirm = MessageBox.Show(
-                    "Delete this job?",
-                    "Confirm",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning
-                );
-
-                if (confirm != DialogResult.Yes)
-                    return;
 
                 db.Open();
 
@@ -193,11 +167,11 @@ namespace JobVacancyForm
                 MySqlCommand cmd = new MySqlCommand(query, db.connection);
                 cmd.Parameters.AddWithValue("@id", selectedVacancyID);
 
-                int result = cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
                 db.Close();
 
-                MessageBox.Show(result > 0 ? "Deleted Successfully!" : "Delete failed!");
+                MessageBox.Show("Deleted Successfully!");
 
                 LoadJobs();
                 ClearFields();
@@ -214,21 +188,13 @@ namespace JobVacancyForm
             txtJobTitle.Clear();
             txtDescription.Clear();
             txtRequirements.Clear();
-
             cmbStatus.SelectedIndex = 0;
-
             selectedVacancyID = 0;
-            dataGridView1.ClearSelection();
         }
 
         private void CLEAR_Click(object sender, EventArgs e)
         {
             ClearFields();
-        }
-
-        private void JobVacancyForm_Load_1(object sender, EventArgs e)
-        {
-
         }
     }
 }
