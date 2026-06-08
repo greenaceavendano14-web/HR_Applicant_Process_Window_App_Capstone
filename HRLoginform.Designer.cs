@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using System.Drawing;
 
@@ -32,43 +32,44 @@ namespace HRApplicantSystem
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HRLoginForm));
             panelHeader = new Panel();
+            pictureBoxLogo = new PictureBox();
             Company = new Label();
             panelLogIn = new Panel();
-            LogIn = new Label();
-            Email = new Label();
-            txtEmail = new TextBox();
-            Password = new Label();
-            textBox1 = new TextBox();
+            btnShowPassword = new Button();
             btnLogin = new Button();
-            this.pictureBox1 = new PictureBox();
+            txtPassword = new TextBox();
+            Password = new Label();
+            txtEmail = new TextBox();
+            Email = new Label();
+            LogIn = new Label();
             panelHeader.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxLogo).BeginInit();
             panelLogIn.SuspendLayout();
             SuspendLayout();
             // 
             // panelHeader
             // 
             panelHeader.BackColor = Color.Thistle;
+            panelHeader.Controls.Add(pictureBoxLogo);
             panelHeader.Controls.Add(Company);
-            panelHeader.Controls.Add(pictureBox1);
             panelHeader.Dock = DockStyle.Top;
             panelHeader.Location = new Point(0, 0);
             panelHeader.Name = "panelHeader";
             panelHeader.Size = new Size(884, 100);
             panelHeader.TabIndex = 0;
             // 
-            // pictureBox1
+            // pictureBoxLogo
             // 
-            pictureBox1.ErrorImage = Properties.Resources._6d596f29_cbc8_4189_82bd_307777d73461;
-            pictureBox1.Image = Properties.Resources._6d596f29_cbc8_4189_82bd_307777d73461_removebg_preview;
-            pictureBox1.ImageLocation = "middle";
-            pictureBox1.Location = new Point(-23, -13);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(215, 126);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
+            pictureBoxLogo.BackColor = Color.White;
+            pictureBoxLogo.Image = (Image)resources.GetObject("pictureBoxLogo.Image");
+            pictureBoxLogo.Location = new Point(0, -21);
+            pictureBoxLogo.Name = "pictureBoxLogo";
+            pictureBoxLogo.Size = new Size(203, 142);
+            pictureBoxLogo.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBoxLogo.TabIndex = 2;
+            pictureBoxLogo.TabStop = false;
             // 
             // Company
             // 
@@ -85,67 +86,28 @@ namespace HRApplicantSystem
             // panelLogIn
             // 
             panelLogIn.BackColor = Color.White;
+            panelLogIn.Controls.Add(btnShowPassword);
             panelLogIn.Controls.Add(btnLogin);
-            panelLogIn.Controls.Add(textBox1);
+            panelLogIn.Controls.Add(txtPassword);
             panelLogIn.Controls.Add(Password);
             panelLogIn.Controls.Add(txtEmail);
             panelLogIn.Controls.Add(Email);
             panelLogIn.Controls.Add(LogIn);
-            panelLogIn.Location = new Point(209, 153);
+            panelLogIn.Location = new Point(250, 155);
             panelLogIn.Name = "panelLogIn";
             panelLogIn.Size = new Size(400, 300);
             panelLogIn.TabIndex = 1;
             // 
-            // LogIn
+            // btnShowPassword
             // 
-            LogIn.AutoSize = true;
-            LogIn.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
-            LogIn.ForeColor = Color.DimGray;
-            LogIn.Location = new Point(140, 40);
-            LogIn.Name = "LogIn";
-            LogIn.Size = new Size(117, 30);
-            LogIn.TabIndex = 0;
-            LogIn.Text = "HR LOGIN";
-            LogIn.Click += this.LogIn_Click;
-            // 
-            // Email
-            // 
-            Email.AutoSize = true;
-            Email.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            Email.ForeColor = Color.DimGray;
-            Email.Location = new Point(50, 85);
-            Email.Name = "Email";
-            Email.Size = new Size(108, 20);
-            Email.TabIndex = 1;
-            Email.Text = "Email Address";
-            // 
-            // txtEmail
-            // 
-            txtEmail.BorderStyle = BorderStyle.FixedSingle;
-            txtEmail.Location = new Point(50, 110);
-            txtEmail.Name = "txtEmail";
-            txtEmail.Size = new Size(250, 23);
-            txtEmail.TabIndex = 2;
-            // 
-            // Password
-            // 
-            Password.AutoSize = true;
-            Password.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            Password.ForeColor = Color.DimGray;
-            Password.Location = new Point(50, 160);
-            Password.Name = "Password";
-            Password.Size = new Size(76, 20);
-            Password.TabIndex = 3;
-            Password.Text = "Password";
-            // 
-            // textBox1
-            // 
-            textBox1.BorderStyle = BorderStyle.FixedSingle;
-            textBox1.Location = new Point(50, 185);
-            textBox1.Name = "textBox1";
-            textBox1.PasswordChar = '*';
-            textBox1.Size = new Size(250, 23);
-            textBox1.TabIndex = 4;
+            btnShowPassword.Font = new Font("Segoe UI", 12F);
+            btnShowPassword.Location = new Point(306, 183);
+            btnShowPassword.Name = "btnShowPassword";
+            btnShowPassword.Size = new Size(30, 30);
+            btnShowPassword.TabIndex = 6;
+            btnShowPassword.Text = "👁";
+            btnShowPassword.UseVisualStyleBackColor = true;
+            btnShowPassword.Click += btnShowPassword_Click;
             // 
             // btnLogin
             // 
@@ -159,8 +121,59 @@ namespace HRApplicantSystem
             btnLogin.TabIndex = 5;
             btnLogin.Text = "LOGIN";
             btnLogin.UseVisualStyleBackColor = false;
+            btnLogin.Click += btnLogin_Click;
             // 
-            // HrLoginForm
+            // txtPassword
+            // 
+            txtPassword.BorderStyle = BorderStyle.FixedSingle;
+            txtPassword.Location = new Point(50, 185);
+            txtPassword.Name = "txtPassword";
+            txtPassword.PasswordChar = '*';
+            txtPassword.Size = new Size(250, 23);
+            txtPassword.TabIndex = 4;
+            // 
+            // Password
+            // 
+            Password.AutoSize = true;
+            Password.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            Password.ForeColor = Color.DimGray;
+            Password.Location = new Point(50, 160);
+            Password.Name = "Password";
+            Password.Size = new Size(76, 20);
+            Password.TabIndex = 3;
+            Password.Text = "Password";
+            // 
+            // txtEmail
+            // 
+            txtEmail.BorderStyle = BorderStyle.FixedSingle;
+            txtEmail.Location = new Point(50, 110);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(250, 23);
+            txtEmail.TabIndex = 2;
+            // 
+            // Email
+            // 
+            Email.AutoSize = true;
+            Email.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            Email.ForeColor = Color.DimGray;
+            Email.Location = new Point(50, 85);
+            Email.Name = "Email";
+            Email.Size = new Size(108, 20);
+            Email.TabIndex = 1;
+            Email.Text = "Email Address";
+            // 
+            // LogIn
+            // 
+            LogIn.AutoSize = true;
+            LogIn.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            LogIn.ForeColor = Color.DimGray;
+            LogIn.Location = new Point(140, 40);
+            LogIn.Name = "LogIn";
+            LogIn.Size = new Size(117, 30);
+            LogIn.TabIndex = 0;
+            LogIn.Text = "HR LOGIN";
+            // 
+            // HRLoginForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -170,13 +183,14 @@ namespace HRApplicantSystem
             Controls.Add(panelHeader);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            Name = "HrLoginForm";
+            Name = "HRLoginForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Form1";
+            Text = "HR Login";
+            WindowState = FormWindowState.Minimized;
             Load += Form1_Load;
             panelHeader.ResumeLayout(false);
             panelHeader.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxLogo).EndInit();
             panelLogIn.ResumeLayout(false);
             panelLogIn.PerformLayout();
             ResumeLayout(false);
@@ -185,7 +199,6 @@ namespace HRApplicantSystem
         #endregion
 
         private Panel panelHeader;
-        private PictureBox pictureBox1;
         private Label Company;
         private Panel panelLogIn;
         private Label LogIn;
@@ -193,6 +206,8 @@ namespace HRApplicantSystem
         private TextBox txtEmail;
         private Label Email;
         private Button btnLogin;
-        private TextBox textBox1;
+        private TextBox txtPassword;
+        private PictureBox pictureBoxLogo;
+        private Button btnShowPassword;
     }
 }
