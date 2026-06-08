@@ -1,34 +1,57 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Data;
 
-namespace ApplicationForm
+namespace HRApplicationFormView
 {
     public class DBConnection
     {
+        private readonly string connectionString =
+            "server=localhost;port=3306;database=HR_ApplicantSystem;uid=root;pwd=KylaM@e123;";
+
         private MySqlConnection conn;
 
         public DBConnection()
         {
-            conn = new MySqlConnection(
-                "server=localhost;database=HR_ApplicantSystem;uid=root;pwd=KylaM@e123;"
-            );
+            conn = new MySqlConnection(connectionString);
         }
 
+        // ================= OPEN =================
         public void OpenConnection()
         {
-            if (conn.State == System.Data.ConnectionState.Closed)
-                conn.Open();
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DB Open Error: " + ex.Message);
+            }
         }
 
-        public void CloseConnection()
-        {
-            if (conn.State == System.Data.ConnectionState.Open)
-                conn.Close();
-        }
-
+        // ================= GET CONNECTION =================
         public MySqlConnection GetConnection()
         {
             return conn;
+        }
+
+        // ================= CLOSE =================
+        public void CloseConnection()
+        {
+            try
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("DB Close Error: " + ex.Message);
+            }
         }
     }
 }
