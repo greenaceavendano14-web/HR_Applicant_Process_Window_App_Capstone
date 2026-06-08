@@ -11,12 +11,19 @@ namespace ApplicantAuthDocumentManagement
         public static string FirstName { get; set; }
         public static string LastName { get; set; }
 
-        public static string FullName => $"{FirstName} {LastName}";
+        public static string FullName
+        {
+            get
+            {
+                return FirstName + " " + LastName;
+            }
+        }
 
         public static void Clear()
         {
             AccountID = 0;
             ApplicantID = 0;
+
             Email = null;
             FirstName = null;
             LastName = null;
