@@ -29,8 +29,10 @@
         private void InitializeComponent()
         {
             this.pnlBackround = new System.Windows.Forms.Panel();
+            this.btnExit = new System.Windows.Forms.Button();
             this.lnkRegister = new System.Windows.Forms.LinkLabel();
             this.pnlLogin = new System.Windows.Forms.Panel();
+            this.chkShowPassword = new System.Windows.Forms.CheckBox();
             this.lblError = new System.Windows.Forms.Label();
             this.lblLogin = new System.Windows.Forms.Label();
             this.lblEmail = new System.Windows.Forms.Label();
@@ -41,8 +43,7 @@
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblCompany = new System.Windows.Forms.Label();
             this.picLogo = new System.Windows.Forms.PictureBox();
-            this.btnExit = new System.Windows.Forms.Button();
-            this.chkShowPassword = new System.Windows.Forms.CheckBox();
+            this.btnHRLogin = new System.Windows.Forms.Button();
             this.pnlBackround.SuspendLayout();
             this.pnlLogin.SuspendLayout();
             this.pnlHeader.SuspendLayout();
@@ -52,15 +53,28 @@
             // pnlBackround
             // 
             this.pnlBackround.BackColor = System.Drawing.Color.LavenderBlush;
+            this.pnlBackround.Controls.Add(this.btnHRLogin);
             this.pnlBackround.Controls.Add(this.btnExit);
             this.pnlBackround.Controls.Add(this.lnkRegister);
             this.pnlBackround.Controls.Add(this.pnlLogin);
             this.pnlBackround.Controls.Add(this.pnlHeader);
-            this.pnlBackround.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlBackround.Location = new System.Drawing.Point(0, 0);
             this.pnlBackround.Name = "pnlBackround";
             this.pnlBackround.Size = new System.Drawing.Size(982, 553);
             this.pnlBackround.TabIndex = 1;
+            // 
+            // btnExit
+            // 
+            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExit.Location = new System.Drawing.Point(720, 505);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(110, 35);
+            this.btnExit.TabIndex = 10;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // lnkRegister
             // 
@@ -90,6 +104,20 @@
             this.pnlLogin.Name = "pnlLogin";
             this.pnlLogin.Size = new System.Drawing.Size(450, 360);
             this.pnlLogin.TabIndex = 8;
+            // 
+            // chkShowPassword
+            // 
+            this.chkShowPassword.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkShowPassword.AutoSize = true;
+            this.chkShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkShowPassword.Location = new System.Drawing.Point(405, 181);
+            this.chkShowPassword.Name = "chkShowPassword";
+            this.chkShowPassword.Size = new System.Drawing.Size(29, 26);
+            this.chkShowPassword.TabIndex = 11;
+            this.chkShowPassword.Text = "👁️";
+            this.chkShowPassword.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkShowPassword.UseVisualStyleBackColor = true;
+            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.chkShowPassword_CheckedChanged);
             // 
             // lblError
             // 
@@ -199,30 +227,18 @@
             this.picLogo.TabIndex = 1;
             this.picLogo.TabStop = false;
             // 
-            // btnExit
+            // btnHRLogin
             // 
-            this.btnExit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExit.Location = new System.Drawing.Point(25, 506);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(110, 35);
-            this.btnExit.TabIndex = 10;
-            this.btnExit.Text = "Exit";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
-            // 
-            // chkShowPassword
-            // 
-            this.chkShowPassword.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chkShowPassword.AutoSize = true;
-            this.chkShowPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkShowPassword.Location = new System.Drawing.Point(405, 181);
-            this.chkShowPassword.Name = "chkShowPassword";
-            this.chkShowPassword.Size = new System.Drawing.Size(29, 26);
-            this.chkShowPassword.TabIndex = 11;
-            this.chkShowPassword.Text = "👁️";
-            this.chkShowPassword.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.chkShowPassword.UseVisualStyleBackColor = true;
-            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.chkShowPassword_CheckedChanged);
+            this.btnHRLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHRLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHRLogin.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHRLogin.Location = new System.Drawing.Point(840, 505);
+            this.btnHRLogin.Name = "btnHRLogin";
+            this.btnHRLogin.Size = new System.Drawing.Size(110, 35);
+            this.btnHRLogin.TabIndex = 11;
+            this.btnHRLogin.Text = "HR Login";
+            this.btnHRLogin.UseVisualStyleBackColor = true;
+            this.btnHRLogin.Click += new System.EventHandler(this.btnHRLogin_Click);
             // 
             // LoginForm
             // 
@@ -263,5 +279,6 @@
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.CheckBox chkShowPassword;
+        private System.Windows.Forms.Button btnHRLogin;
     }
 }

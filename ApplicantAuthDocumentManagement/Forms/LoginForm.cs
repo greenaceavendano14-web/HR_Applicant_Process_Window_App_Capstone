@@ -63,6 +63,12 @@ namespace ApplicantAuthDocumentManagement.Forms
                                 Session.LastName = reader["LastName"].ToString();
 
                                 MessageBox.Show($"Welcome, {Session.FullName}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                                ApplicantDashboard dashboard = new ApplicantDashboard();
+
+                                dashboard.Show();
+
+                                this.Hide();
                             }
                             else
                             {
@@ -89,7 +95,12 @@ namespace ApplicantAuthDocumentManagement.Forms
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            DialogResult result = MessageBox.Show("Are you sure you want to exit the application?", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
 
         private void chkShowPassword_CheckedChanged(object sender, EventArgs e)
@@ -104,6 +115,11 @@ namespace ApplicantAuthDocumentManagement.Forms
                 txtPassword.PasswordChar = '•';
                 chkShowPassword.Text = "👁️";
             }
+        }
+
+        private void btnHRLogin_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("HR Login Form coming soon!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
