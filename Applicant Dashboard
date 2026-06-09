@@ -54,6 +54,18 @@ namespace ApplicantDashboard
         {
 
         }
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Logging out...");
+            this.Close();
+        }
+        private void btnProfile_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Applicant Profile Opened!");
+        }
+
+
+
     }
 }
 
@@ -87,7 +99,6 @@ namespace ApplicantDashboard
             this.lstDocs = new System.Windows.Forms.ListBox();
             this.grpInterview = new System.Windows.Forms.GroupBox();
             this.lblInterview = new System.Windows.Forms.Label();
-            this.btnUpload = new System.Windows.Forms.Button();
             this.btnLogout = new System.Windows.Forms.Button();
             this.grpUpdates.SuspendLayout();
             this.headerPanel.SuspendLayout();
@@ -96,9 +107,9 @@ namespace ApplicantDashboard
             this.grpDocs.SuspendLayout();
             this.grpInterview.SuspendLayout();
             this.SuspendLayout();
-            
+            // 
             // grpUpdates
-            
+            // 
             this.grpUpdates.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpUpdates.Controls.Add(this.lstUpdates);
@@ -108,7 +119,9 @@ namespace ApplicantDashboard
             this.grpUpdates.TabIndex = 5;
             this.grpUpdates.TabStop = false;
             this.grpUpdates.Text = "Recent Updates";
+            // 
             // lstUpdates
+            // 
             this.lstUpdates.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstUpdates.ItemHeight = 16;
             this.lstUpdates.Items.AddRange(new object[] {
@@ -119,7 +132,9 @@ namespace ApplicantDashboard
             this.lstUpdates.Name = "lstUpdates";
             this.lstUpdates.Size = new System.Drawing.Size(414, 179);
             this.lstUpdates.TabIndex = 0;
+            // 
             // headerPanel
+            // 
             this.headerPanel.BackColor = System.Drawing.Color.Thistle;
             this.headerPanel.Controls.Add(this.lblTitle);
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -127,7 +142,9 @@ namespace ApplicantDashboard
             this.headerPanel.Name = "headerPanel";
             this.headerPanel.Size = new System.Drawing.Size(900, 90);
             this.headerPanel.TabIndex = 0;
+            // 
             // lblTitle
+            // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Georgia", 22F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.White;
@@ -153,7 +170,9 @@ namespace ApplicantDashboard
             this.grpInfo.TabStop = false;
             this.grpInfo.Text = "Application Information";
             this.grpInfo.Enter += new System.EventHandler(this.grpInfo_Enter);
+            // 
             // lblApplicant
+            // 
             this.lblApplicant.AutoSize = true;
             this.lblApplicant.Location = new System.Drawing.Point(20, 35);
             this.lblApplicant.Name = "lblApplicant";
@@ -161,28 +180,36 @@ namespace ApplicantDashboard
             this.lblApplicant.TabIndex = 0;
             this.lblApplicant.Text = "Applicant: Juan Dela Cruz";
             this.lblApplicant.Click += new System.EventHandler(this.lblApplicant_Click);
+            // 
             // lblPosition
+            // 
             this.lblPosition.AutoSize = true;
             this.lblPosition.Location = new System.Drawing.Point(20, 65);
             this.lblPosition.Name = "lblPosition";
             this.lblPosition.Size = new System.Drawing.Size(180, 16);
             this.lblPosition.TabIndex = 1;
             this.lblPosition.Text = "Position: Software Developer";
+            // 
             // lblApplicationID
+            // 
             this.lblApplicationID.AutoSize = true;
             this.lblApplicationID.Location = new System.Drawing.Point(400, 35);
             this.lblApplicationID.Name = "lblApplicationID";
             this.lblApplicationID.Size = new System.Drawing.Size(148, 16);
             this.lblApplicationID.TabIndex = 2;
             this.lblApplicationID.Text = "Application ID: APP-001";
+            // 
             // lblDateApplied
+            // 
             this.lblDateApplied.AutoSize = true;
             this.lblDateApplied.Location = new System.Drawing.Point(400, 65);
             this.lblDateApplied.Name = "lblDateApplied";
             this.lblDateApplied.Size = new System.Drawing.Size(172, 16);
             this.lblDateApplied.TabIndex = 3;
             this.lblDateApplied.Text = "Date Applied: June 10, 2026";
+            // 
             // btnProfile
+            // 
             this.btnProfile.BackColor = System.Drawing.Color.Thistle;
             this.btnProfile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnProfile.Location = new System.Drawing.Point(754, 89);
@@ -190,8 +217,11 @@ namespace ApplicantDashboard
             this.btnProfile.Size = new System.Drawing.Size(80, 25);
             this.btnProfile.TabIndex = 6;
             this.btnProfile.Text = "My Profile";
+            this.btnProfile.Click += new System.EventHandler(this.btnProfile_Click);
             this.btnProfile.UseVisualStyleBackColor = false;
+            // 
             // grpStatus
+            // 
             this.grpStatus.Controls.Add(this.lblStatus);
             this.grpStatus.Controls.Add(this.progressBar1);
             this.grpStatus.Controls.Add(this.lblProgress);
@@ -201,7 +231,9 @@ namespace ApplicantDashboard
             this.grpStatus.TabIndex = 2;
             this.grpStatus.TabStop = false;
             this.grpStatus.Text = "Current Status";
+            // 
             // lblStatus
+            // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.lblStatus.ForeColor = System.Drawing.Color.DarkGreen;
@@ -210,20 +242,26 @@ namespace ApplicantDashboard
             this.lblStatus.Size = new System.Drawing.Size(229, 28);
             this.lblStatus.TabIndex = 0;
             this.lblStatus.Text = "Under Initial Screening";
+            // 
             // progressBar1
+            // 
             this.progressBar1.Location = new System.Drawing.Point(20, 65);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(300, 20);
             this.progressBar1.TabIndex = 1;
             this.progressBar1.Value = 60;
+            // 
             // lblProgress
+            // 
             this.lblProgress.AutoSize = true;
             this.lblProgress.Location = new System.Drawing.Point(330, 65);
             this.lblProgress.Name = "lblProgress";
             this.lblProgress.Size = new System.Drawing.Size(33, 16);
             this.lblProgress.TabIndex = 2;
             this.lblProgress.Text = "60%";
+            // 
             // grpDocs
+            // 
             this.grpDocs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.grpDocs.Controls.Add(this.lstDocs);
             this.grpDocs.Location = new System.Drawing.Point(440, 230);
@@ -232,7 +270,9 @@ namespace ApplicantDashboard
             this.grpDocs.TabIndex = 3;
             this.grpDocs.TabStop = false;
             this.grpDocs.Text = "Missing Documents";
+            // 
             // lstDocs
+            // 
             this.lstDocs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstDocs.ItemHeight = 16;
             this.lstDocs.Items.AddRange(new object[] {
@@ -242,7 +282,9 @@ namespace ApplicantDashboard
             this.lstDocs.Name = "lstDocs";
             this.lstDocs.Size = new System.Drawing.Size(414, 129);
             this.lstDocs.TabIndex = 0;
+            // 
             // grpInterview
+            // 
             this.grpInterview.Controls.Add(this.lblInterview);
             this.grpInterview.Location = new System.Drawing.Point(20, 350);
             this.grpInterview.Name = "grpInterview";
@@ -251,23 +293,18 @@ namespace ApplicantDashboard
             this.grpInterview.TabStop = false;
             this.grpInterview.Text = "Interview Schedule";
             this.grpInterview.Enter += new System.EventHandler(this.grpInterview_Enter);
+            // 
             // lblInterview
+            // 
             this.lblInterview.AutoSize = true;
             this.lblInterview.Location = new System.Drawing.Point(20, 30);
             this.lblInterview.Name = "lblInterview";
             this.lblInterview.Size = new System.Drawing.Size(122, 48);
             this.lblInterview.TabIndex = 0;
             this.lblInterview.Text = "Date: June 20, 2026\r\nTime: 9:00 AM\r\nLocation: HR Office";
-            // btnUpload
-            this.btnUpload.BackColor = System.Drawing.Color.Thistle;
-            this.btnUpload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpload.Location = new System.Drawing.Point(28, 646);
-            this.btnUpload.Name = "btnUpload";
-            this.btnUpload.Size = new System.Drawing.Size(75, 25);
-            this.btnUpload.TabIndex = 7;
-            this.btnUpload.Text = "Upload Documents";
-            this.btnUpload.UseVisualStyleBackColor = false;
+            // 
             // btnLogout
+            // 
             this.btnLogout.BackColor = System.Drawing.Color.Thistle;
             this.btnLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogout.Location = new System.Drawing.Point(782, 646);
@@ -275,8 +312,11 @@ namespace ApplicantDashboard
             this.btnLogout.Size = new System.Drawing.Size(75, 25);
             this.btnLogout.TabIndex = 8;
             this.btnLogout.Text = "Logout";
+            this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
             this.btnLogout.UseVisualStyleBackColor = false;
+            // 
             // Form1
+            // 
             this.BackColor = System.Drawing.Color.LavenderBlush;
             this.ClientSize = new System.Drawing.Size(900, 700);
             this.Controls.Add(this.headerPanel);
@@ -285,7 +325,6 @@ namespace ApplicantDashboard
             this.Controls.Add(this.grpDocs);
             this.Controls.Add(this.grpInterview);
             this.Controls.Add(this.grpUpdates);
-            this.Controls.Add(this.btnUpload);
             this.Controls.Add(this.btnLogout);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -318,7 +357,6 @@ namespace ApplicantDashboard
         private GroupBox grpUpdates;
         private ListBox lstUpdates;
         private Button btnProfile;
-        private Button btnUpload;
         private Button btnLogout;
         private ProgressBar progressBar1;
         private Label lblProgress;
