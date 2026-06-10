@@ -1,13 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Data;
-using System.Data.SqlClient;
 
-namespace HRScreeningForm
+namespace HRInterviewEvaluationForm
 {
     public class DBConnection
     {
         private MySqlConnection conn;
 
+        // 🔥 CHANGE ONLY THIS IF YOUR PASSWORD OR DB CHANGES
         private string connectionString =
             "server=localhost;port=3306;database=HR_ApplicantSystem;uid=root;pwd=KylaM@e123;";
 
