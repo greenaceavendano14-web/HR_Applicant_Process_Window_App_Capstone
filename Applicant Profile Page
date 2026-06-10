@@ -27,8 +27,13 @@ namespace MyProfileModule
         {
             MessageBox.Show("Profile Updated Successfully!");
         }
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
+
 
 #designer
 
@@ -63,7 +68,7 @@ namespace MyProfileModule
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        
+
         private Panel headerPanel;
         private Label lblTitle;
 
@@ -361,6 +366,7 @@ namespace MyProfileModule
             this.btnBack.TabIndex = 7;
             this.btnBack.Text = "Back";
             this.btnBack.UseVisualStyleBackColor = false;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // Form1
             // 
@@ -383,8 +389,7 @@ namespace MyProfileModule
             this.headerPanel.PerformLayout();
             this.ResumeLayout(false);
 
-    }
+        }
         #endregion
     }
 }
-
