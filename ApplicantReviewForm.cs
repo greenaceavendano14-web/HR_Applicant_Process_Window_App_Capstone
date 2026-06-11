@@ -1,14 +1,15 @@
-﻿using HRApplicationFormView;
+using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace HRApplicationFormVieww
+namespace HRApplicantSystem
 {
     public partial class ApplicantReviewForm : Form
     {
-        DBConnection db = new DBConnection();
+        DbConnection db = new DbConnection();
 
         int selectedApplicationID = 0;
 
@@ -23,8 +24,6 @@ namespace HRApplicationFormVieww
             btnSaveReview.Click += btnSaveReview_Click;
             btnRefresh.Click += btnRefresh_Click;
             btnClose.Click += btnClose_Click;
-
-            // ================= ADD THIS =================
             btnClear.Click += btnClear_Click;
         }
 
@@ -46,46 +45,40 @@ namespace HRApplicationFormVieww
         {
             try
             {
-                db.OpenConnection();
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
 
-                string query = @"
-                SELECT
-                    a.ApplicationID,
-                    CONCAT(ap.FirstName,' ',ap.LastName) AS ApplicantName,
-                    j.JobTitle,
-                    a.CurrentStatus,
-                    a.SubmittedAt
-                FROM Applications a
-                INNER JOIN Applicants ap
-                    ON a.ApplicantID = ap.ApplicantID
-                INNER JOIN JobVacancies j
-                    ON a.VacancyID = j.VacancyID";
+                    string query = @"
+                        SELECT
+                            a.ApplicationID,
+                            CONCAT(ap.FirstName,' ',ap.LastName) AS ApplicantName,
+                            j.JobTitle,
+                            a.CurrentStatus,
+                            a.SubmittedAt
+                        FROM Applications a
+                        INNER JOIN Applicants ap ON a.ApplicantID = ap.ApplicantID
+                        INNER JOIN JobVacancies j ON a.VacancyID = j.VacancyID";
 
-                MySqlDataAdapter da =
-                    new MySqlDataAdapter(query, db.GetConnection());
+                    MySqlDataAdapter da = new MySqlDataAdapter(query, conn);
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
 
-                dgvApplicants.DataSource = dt;
-
-                db.CloseConnection();
+                    dgvApplicants.DataSource = dt;
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Load Error: " + ex.Message);
             }
         }
 
-        private void dgvApplicants_CellClick(
-            object sender,
-            DataGridViewCellEventArgs e)
+        private void dgvApplicants_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0)
-                return;
+            if (e.RowIndex < 0) return;
 
-            DataGridViewRow row =
-                dgvApplicants.Rows[e.RowIndex];
+            DataGridViewRow row = dgvApplicants.Rows[e.RowIndex];
 
             selectedApplicationID =
                 Convert.ToInt32(row.Cells["ApplicationID"].Value);
@@ -100,77 +93,133 @@ namespace HRApplicationFormVieww
                 row.Cells["CurrentStatus"].Value.ToString();
         }
 
-        private void btnSaveReview_Click(
-            object sender,
-            EventArgs e)
+        // ================= SAVE REVIEW (WITH AUDIT + TRANSACTION) =================
+        private void btnSaveReview_Click(object sender, EventArgs e)
         {
-            try
+            if (selectedApplicationID == 0)
             {
-                if (selectedApplicationID == 0)
-                {
-                    MessageBox.Show("Please select an applicant.");
-                    return;
-                }
-
-                db.OpenConnection();
-
-                string updateQuery = @"
-                UPDATE Applications
-                SET CurrentStatus=@status
-                WHERE ApplicationID=@id";
-
-                MySqlCommand cmd =
-                    new MySqlCommand(updateQuery,
-                    db.GetConnection());
-
-                cmd.Parameters.AddWithValue("@status",
-                    cmbStatus.Text);
-
-                cmd.Parameters.AddWithValue("@id",
-                    selectedApplicationID);
-
-                cmd.ExecuteNonQuery();
-
-                string reviewQuery = @"
-                INSERT INTO ApplicantReviews
-                (
-                    ApplicationID,
-                    Remarks,
-                    Recommendation,
-                    ReviewedBy
-                )
-                VALUES
-                (
-                    @app,
-                    @remarks,
-                    @recommendation,
-                    'HR Staff'
-                )";
-
-                MySqlCommand reviewCmd =
-                    new MySqlCommand(reviewQuery,
-                    db.GetConnection());
-
-                reviewCmd.Parameters.AddWithValue("@app", selectedApplicationID);
-                reviewCmd.Parameters.AddWithValue("@remarks", txtRemarks.Text);
-                reviewCmd.Parameters.AddWithValue("@recommendation", cmbStatus.Text);
-
-                reviewCmd.ExecuteNonQuery();
-
-                db.CloseConnection();
-
-                MessageBox.Show("Review Saved Successfully!");
-
-                LoadApplicants();
-
-                ClearFields();
+                MessageBox.Show("Please select an applicant.");
+                return;
             }
-            catch (Exception ex)
+
+            if (string.IsNullOrWhiteSpace(cmbStatus.Text))
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Please select a status.");
+                return;
+            }
+
+            string remarks = string.IsNullOrWhiteSpace(txtRemarks.Text)
+                ? "No remarks"
+                : txtRemarks.Text;
+
+            using (MySqlConnection conn = db.GetConnection())
+            {
+                conn.Open();
+                MySqlTransaction transaction = conn.BeginTransaction();
+
+                try
+                {
+                    // ================= GET OLD STATUS =================
+                    string oldStatus = "";
+
+                    string getQuery = @"
+                        SELECT CurrentStatus
+                        FROM Applications
+                        WHERE ApplicationID=@id";
+
+                    MySqlCommand getCmd = new MySqlCommand(getQuery, conn, transaction);
+                    getCmd.Parameters.AddWithValue("@id", selectedApplicationID);
+
+                    object result = getCmd.ExecuteScalar();
+                    if (result != null)
+                        oldStatus = result.ToString();
+
+                    // ================= UPDATE APPLICATION =================
+                    string updateQuery = @"
+                        UPDATE Applications
+                        SET CurrentStatus = @status
+                        WHERE ApplicationID = @id";
+
+                    MySqlCommand updateCmd = new MySqlCommand(updateQuery, conn, transaction);
+                    updateCmd.Parameters.AddWithValue("@status", cmbStatus.Text);
+                    updateCmd.Parameters.AddWithValue("@id", selectedApplicationID);
+                    updateCmd.ExecuteNonQuery();
+
+                    // ================= INSERT REVIEW =================
+                    string reviewQuery = @"
+                        INSERT INTO ApplicantReviews
+                        (
+                            ApplicationID,
+                            Remarks,
+                            Recommendation,
+                            ReviewedBy
+                        )
+                        VALUES
+                        (
+                            @app,
+                            @remarks,
+                            @recommendation,
+                            @reviewedBy
+                        )";
+
+                    MySqlCommand reviewCmd = new MySqlCommand(reviewQuery, conn, transaction);
+                    reviewCmd.Parameters.AddWithValue("@app", selectedApplicationID);
+                    reviewCmd.Parameters.AddWithValue("@remarks", remarks);
+                    reviewCmd.Parameters.AddWithValue("@recommendation", cmbStatus.Text);
+                    reviewCmd.Parameters.AddWithValue("@reviewedBy", Session.UserID);
+                    reviewCmd.ExecuteNonQuery();
+
+                    // ================= AUDIT TRAIL =================
+                    string auditQuery = @"
+                        INSERT INTO AuditTrail
+                        (
+                            ActorType,
+                            ActorID,
+                            Action,
+                            TargetTable,
+                            TargetID,
+                            Details
+                        )
+                        VALUES
+                        (
+                            @type,
+                            @id,
+                            @action,
+                            'Applications',
+                            @target,
+                            @details
+                        )";
+
+                    MySqlCommand auditCmd = new MySqlCommand(auditQuery, conn, transaction);
+                    auditCmd.Parameters.AddWithValue("@type", Session.RoleName);
+                    auditCmd.Parameters.AddWithValue("@id", Session.UserID);
+                    auditCmd.Parameters.AddWithValue("@action", "Applicant Review Update");
+                    auditCmd.Parameters.AddWithValue("@target", selectedApplicationID);
+                    auditCmd.Parameters.AddWithValue("@details",
+                        $"Old: {oldStatus}, New: {cmbStatus.Text}, Remarks: {remarks}");
+
+                    auditCmd.ExecuteNonQuery();
+
+                    // ================= COMMIT =================
+                    transaction.Commit();
+
+                    MessageBox.Show("Review Saved Successfully!",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    LoadApplicants();
+                    ClearFields();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    MessageBox.Show("Save Error: " + ex.Message);
+                }
             }
         }
 
+        // ================= OTHER BUTTONS =================
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadApplicants();
@@ -181,7 +230,6 @@ namespace HRApplicationFormVieww
             this.Close();
         }
 
-        // ================= CLEAR FUNCTION =================
         private void btnClear_Click(object sender, EventArgs e)
         {
             ClearFields();
@@ -200,8 +248,20 @@ namespace HRApplicationFormVieww
             dgvApplicants.ClearSelection();
         }
 
-        private void label2_Click(object sender, EventArgs e) { }
-        private void label5_Click(object sender, EventArgs e) { }
-        private void label6_Click(object sender, EventArgs e) { }
+        // NAVIGATION BUTTONS
+        private void btnScreening_Click(object sender, EventArgs e)
+        {
+            new ScreeningForm().ShowDialog();
+        }
+
+        private void Scheduling_Click(object sender, EventArgs e)
+        {
+            new InterviewScheduleForm().ShowDialog();
+        }
+
+        private void btnEvaluation_Click(object sender, EventArgs e)
+        {
+            new InterviewEvaluationForm().ShowDialog();
+        }
     }
 }
