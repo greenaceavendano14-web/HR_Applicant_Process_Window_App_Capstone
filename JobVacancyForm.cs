@@ -1,13 +1,16 @@
+using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows.Forms;
+using System.IO;
 
-namespace JobVacancyForm
+namespace ApplicantSystem
 {
     public partial class JobVacancyForm : Form
     {
-        DBConnection db = new DBConnection();
+        DbConnection db = new DbConnection();
         int selectedVacancyID = 0;
 
         public JobVacancyForm()
@@ -18,9 +21,10 @@ namespace JobVacancyForm
             dataGridView1.CellClick += dataGridView1_CellClick;
         }
 
-        // ================= LOAD =================
-        private void JobVacancyForm_Load(object sender, EventArgs e)
+        private void JobVacancyForm_Load(object? sender, EventArgs e)
         {
+            LoadDepartments();
+            LoadEmploymentTypes();
             LoadJobs();
 
             cmbStatus.Items.Clear();
@@ -30,22 +34,40 @@ namespace JobVacancyForm
             cmbStatus.SelectedIndex = 0;
         }
 
-        // ================= LOAD JOBS =================
         private void LoadJobs()
         {
             try
             {
-                db.Open();
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
 
-                string query = "SELECT * FROM JobVacancies";
+                    string query = @"
+SELECT
+j.VacancyID,
+d.DepartmentName,
+e.TypeName,
+j.JobTitle,
+j.JobDescription,
+j.Qualifications,
+j.SlotsAvailable,
+j.PostedDate,
+j.Status
+FROM JobVacancies j
+INNER JOIN Departments d
+ON j.DepartmentID = d.DepartmentID
+INNER JOIN EmploymentTypes e
+ON j.EmploymentTypeID = e.EmploymentTypeID";
 
-                MySqlDataAdapter da = new MySqlDataAdapter(query, db.connection);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                    MySqlDataAdapter da =
+                        new MySqlDataAdapter(query, conn);
 
-                dataGridView1.DataSource = dt;
+                    DataTable dt = new DataTable();
 
-                db.Close();
+                    da.Fill(dt);
+
+                    dataGridView1.DataSource = dt;
+                }
 
                 selectedVacancyID = 0;
                 dataGridView1.ClearSelection();
@@ -56,32 +78,67 @@ namespace JobVacancyForm
             }
         }
 
-        // ================= ADD (FIXED) =================
         private void ADD_Click(object sender, EventArgs e)
         {
             try
             {
-                db.Open();
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
 
-                string query = @"
-                INSERT INTO JobVacancies
-                (JobTitle, JobDescription, Qualifications, SlotsAvailable, PostedDate, Status, CreatedByUserID)
+                    string query = @"
+INSERT INTO JobVacancies
+(
+DepartmentID,
+EmploymentTypeID,
+JobTitle,
+JobDescription,
+Qualifications,
+SlotsAvailable,
+PostedDate,
+Status,
+CreatedByUserID
+)
+VALUES
+(
+@dept,
+@emp,
+@title,
+@desc,
+@qual,
+1,
+CURDATE(),
+@status,
+@userId
+)";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@dept", cmbDepartment.SelectedValue);
+                    cmd.Parameters.AddWithValue("@emp", cmbEmploymentType.SelectedValue);
+                    cmd.Parameters.AddWithValue("@title", txtJobTitle.Text);
+                    cmd.Parameters.AddWithValue("@desc", txtDescription.Text);
+                    cmd.Parameters.AddWithValue("@qual", txtRequirements.Text);
+                    cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
+                    cmd.Parameters.AddWithValue("@userId", Session.UserID);
+
+                    cmd.ExecuteNonQuery();
+
+
+                    MySqlCommand audit = new MySqlCommand(@"
+                INSERT INTO AuditTrail
+                (ActorType, ActorID, Action, TargetTable, Details)
                 VALUES
-                (@title, @desc, @qual, 1, CURDATE(), @status, 1)";
+                (@type, @id, 'CREATE_JOB', 'JobVacancies', @details)", conn);
 
-                MySqlCommand cmd = new MySqlCommand(query, db.connection);
+                    audit.Parameters.AddWithValue("@type", Session.RoleName);
+                    audit.Parameters.AddWithValue("@id", Session.UserID);
+                    audit.Parameters.AddWithValue("@details", "Created job: " + txtJobTitle.Text);
 
-                cmd.Parameters.AddWithValue("@title", txtJobTitle.Text);
-                cmd.Parameters.AddWithValue("@desc", txtDescription.Text);
-                cmd.Parameters.AddWithValue("@qual", txtRequirements.Text);
-                cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
-
-                cmd.ExecuteNonQuery();
-
-                db.Close();
+                    audit.ExecuteNonQuery();
+                }
 
                 MessageBox.Show("Job Added Successfully!");
-
                 LoadJobs();
                 ClearFields();
             }
@@ -91,8 +148,62 @@ namespace JobVacancyForm
             }
         }
 
-        // ================= SELECT =================
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void LoadDepartments()
+        {
+            try
+            {
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
+
+                    string query =
+                        "SELECT DepartmentID, DepartmentName FROM Departments ORDER BY DepartmentName";
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(query, conn);
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    cmbDepartment.DataSource = dt;
+                    cmbDepartment.DisplayMember = "DepartmentName";
+                    cmbDepartment.ValueMember = "DepartmentID";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Department Load Error: " + ex.Message);
+            }
+        }
+
+        private void LoadEmploymentTypes()
+        {
+            try
+            {
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
+
+                    string query =
+                        "SELECT EmploymentTypeID, TypeName FROM EmploymentTypes ORDER BY TypeName";
+
+                    MySqlDataAdapter da = new MySqlDataAdapter(query, conn);
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    cmbEmploymentType.DataSource = dt;
+                    cmbEmploymentType.DisplayMember = "TypeName";
+                    cmbEmploymentType.ValueMember = "EmploymentTypeID";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Employment Type Load Error: " + ex.Message);
+            }
+        }
+
+
+        private void dataGridView1_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
@@ -105,41 +216,66 @@ namespace JobVacancyForm
             cmbStatus.Text = row.Cells["Status"].Value?.ToString();
         }
 
-        // ================= UPDATE =================
         private void UPDATE_Click(object sender, EventArgs e)
         {
+            if (!AccessControl.RequireRole(new string[]
+            {
+        RoleManager.Admin,
+        RoleManager.HRManager
+            }))
+                return;
+
+            if (selectedVacancyID == 0)
+            {
+                MessageBox.Show("Select a job first!");
+                return;
+            }
+
             try
             {
-                if (selectedVacancyID == 0)
+                using (MySqlConnection conn = db.GetConnection())
                 {
-                    MessageBox.Show("Select a job first!");
-                    return;
+                    conn.Open();
+
+                    string query = @"
+UPDATE JobVacancies
+SET
+DepartmentID=@dept,
+EmploymentTypeID=@emp,
+JobTitle=@title,
+JobDescription=@desc,
+Qualifications=@qual,
+Status=@status
+WHERE VacancyID=@id";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@id", selectedVacancyID);
+                    cmd.Parameters.AddWithValue("@dept", cmbDepartment.SelectedValue);
+                    cmd.Parameters.AddWithValue("@emp", cmbEmploymentType.SelectedValue);
+                    cmd.Parameters.AddWithValue("@title", txtJobTitle.Text);
+                    cmd.Parameters.AddWithValue("@desc", txtDescription.Text);
+                    cmd.Parameters.AddWithValue("@qual", txtRequirements.Text);
+                    cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
+
+                    cmd.ExecuteNonQuery();
+
+                    // AUDIT
+                    MySqlCommand audit = new MySqlCommand(@"
+                INSERT INTO AuditTrail
+                (ActorType, ActorID, Action, TargetTable, TargetID, Details)
+                VALUES
+                (@type, @id, 'UPDATE_JOB', 'JobVacancies', @jobId, @details)", conn);
+
+                    audit.Parameters.AddWithValue("@type", Session.RoleName);
+                    audit.Parameters.AddWithValue("@id", Session.UserID);
+                    audit.Parameters.AddWithValue("@jobId", selectedVacancyID);
+                    audit.Parameters.AddWithValue("@details", "Updated job: " + txtJobTitle.Text);
+
+                    audit.ExecuteNonQuery();
                 }
 
-                db.Open();
-
-                string query = @"
-                UPDATE JobVacancies
-                SET JobTitle=@title,
-                    JobDescription=@desc,
-                    Qualifications=@qual,
-                    Status=@status
-                WHERE VacancyID=@id";
-
-                MySqlCommand cmd = new MySqlCommand(query, db.connection);
-
-                cmd.Parameters.AddWithValue("@id", selectedVacancyID);
-                cmd.Parameters.AddWithValue("@title", txtJobTitle.Text);
-                cmd.Parameters.AddWithValue("@desc", txtDescription.Text);
-                cmd.Parameters.AddWithValue("@qual", txtRequirements.Text);
-                cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
-
-                cmd.ExecuteNonQuery();
-
-                db.Close();
-
                 MessageBox.Show("Updated Successfully!");
-
                 LoadJobs();
                 ClearFields();
             }
@@ -149,30 +285,49 @@ namespace JobVacancyForm
             }
         }
 
-        // ================= DELETE =================
         private void DELETE_Click(object sender, EventArgs e)
         {
+            if (!AccessControl.RequireRole(new string[]
+            {
+        RoleManager.Admin
+            }))
+                return;
+
+            if (selectedVacancyID == 0)
+            {
+                MessageBox.Show("Select a job first!");
+                return;
+            }
+
             try
             {
-                if (selectedVacancyID == 0)
+                using (MySqlConnection conn = db.GetConnection())
                 {
-                    MessageBox.Show("Select a job first!");
-                    return;
+                    conn.Open();
+
+                    string query =
+                        "DELETE FROM JobVacancies WHERE VacancyID=@id";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@id", selectedVacancyID);
+                    cmd.ExecuteNonQuery();
+
+                    // AUDIT
+                    MySqlCommand audit = new MySqlCommand(@"
+                INSERT INTO AuditTrail
+                (ActorType, ActorID, Action, TargetTable, TargetID, Details)
+                VALUES
+                (@type, @id, 'DELETE_JOB', 'JobVacancies', @jobId, @details)", conn);
+
+                    audit.Parameters.AddWithValue("@type", Session.RoleName);
+                    audit.Parameters.AddWithValue("@id", Session.UserID);
+                    audit.Parameters.AddWithValue("@jobId", selectedVacancyID);
+                    audit.Parameters.AddWithValue("@details", "Deleted job ID: " + selectedVacancyID);
+
+                    audit.ExecuteNonQuery();
                 }
 
-                db.Open();
-
-                string query = "DELETE FROM JobVacancies WHERE VacancyID=@id";
-
-                MySqlCommand cmd = new MySqlCommand(query, db.connection);
-                cmd.Parameters.AddWithValue("@id", selectedVacancyID);
-
-                cmd.ExecuteNonQuery();
-
-                db.Close();
-
                 MessageBox.Show("Deleted Successfully!");
-
                 LoadJobs();
                 ClearFields();
             }
@@ -182,13 +337,20 @@ namespace JobVacancyForm
             }
         }
 
-        // ================= CLEAR =================
         private void ClearFields()
         {
             txtJobTitle.Clear();
             txtDescription.Clear();
             txtRequirements.Clear();
+
+            if (cmbDepartment.Items.Count > 0)
+                cmbDepartment.SelectedIndex = 0;
+
+            if (cmbEmploymentType.Items.Count > 0)
+                cmbEmploymentType.SelectedIndex = 0;
+
             cmbStatus.SelectedIndex = 0;
+
             selectedVacancyID = 0;
         }
 
@@ -196,5 +358,6 @@ namespace JobVacancyForm
         {
             ClearFields();
         }
+
     }
 }
