@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using HRApplicantSystem.Database;
@@ -36,6 +36,7 @@ namespace HRApplicantSystem
 
                 return;
             }
+
 
             try
             {
@@ -89,45 +90,42 @@ namespace HRApplicantSystem
 
                             reader.Close();
 
-                            // Save Session
                             Session.UserID = userId;
                             Session.FullName = fullName;
                             Session.RoleName = role;
 
-                            // Audit Trail - Login
+                        
+
                             MySqlCommand auditCmd =
-                                new MySqlCommand(
-                                @"INSERT INTO AuditTrail
-                                (
-                                    ActorType,
-                                    ActorID,
-                                    Action,
-                                    Details
+                                new MySqlCommand(@"
+                            INSERT INTO AuditTrail
+                            (
+                                ActorType,
+                                ActorID,
+                                Action,
+                                TargetTable,
+                                TargetID,
+                                Details
                                 )
                                 VALUES
                                 (
-                                    @ActorType,
-                                    @ActorID,
-                                    'LOGIN',
-                                    @Details
-                                )",
-                                conn);
-
-                            auditCmd.Parameters.AddWithValue(
-                                "@ActorType",
-                                role);
-
-                            auditCmd.Parameters.AddWithValue(
-                                "@ActorID",
-                                userId);
-
-                            auditCmd.Parameters.AddWithValue(
-                                "@Details",
-                                fullName + " logged in.");
-
+                                @ActorType,
+                                @ActorID,
+                                'LOGIN',
+                                @TargetTable,
+                                @TargetID,
+                                @Details
+                                )", conn);                                                                
+    
+    
+                            auditCmd.Parameters.AddWithValue("@ActorType", role);
+                            auditCmd.Parameters.AddWithValue("@ActorID", userId);
+                            auditCmd.Parameters.AddWithValue("@TargetTable", "Users");
+                            auditCmd.Parameters.AddWithValue("@TargetID", userId);
+                            auditCmd.Parameters.AddWithValue("@Details", fullName + " logged in.");
                             auditCmd.ExecuteNonQuery();
+  
 
-                            // Open Dashboard
                             HRDashboard dashboard =
                                 new HRDashboard(
                                     userId,
