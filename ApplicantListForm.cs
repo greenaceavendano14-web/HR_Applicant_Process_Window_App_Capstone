@@ -1,15 +1,17 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
 
-namespace HRApplicationFormView
+namespace HRApplicantSystem
 {
     public partial class ApplicantListForm : Form
     {
-        DBConnection db = new DBConnection();
+        DbConnection db = new DbConnection();
 
         public ApplicantListForm()
         {
@@ -23,89 +25,191 @@ namespace HRApplicationFormView
             btnClose.Click += btnClose_Click;
         }
 
-        private void ApplicantListForm_Load(object sender, EventArgs e)
+        private void ApplicantListForm_Load(object? sender, EventArgs e)
         {
             LoadApplicants();
         }
 
-        // ================= LOAD =================
+
         private void LoadApplicants()
         {
-            db.OpenConnection();
+            try
+            {
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
 
-            string query = "SELECT * FROM vw_ApplicantListHR";
+                string query = "SELECT * FROM vw_ApplicationSummary";
 
-            MySqlDataAdapter da = new MySqlDataAdapter(query, db.GetConnection());
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+                MySqlDataAdapter da = new MySqlDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
 
-            dgvApplicants.DataSource = dt;
+                dgvApplicants.DataSource = dt;
+                dgvApplicants.ReadOnly = true;
+                dgvApplicants.AllowUserToAddRows = false;
+                dgvApplicants.AllowUserToDeleteRows = false;
+                dgvApplicants.SelectionMode =
+                    DataGridViewSelectionMode.FullRowSelect;
 
-            db.CloseConnection();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Load error: " + ex.Message);
+            }
         }
 
-        // ================= REFRESH =================
-        private void btnRefresh_Click(object sender, EventArgs e)
+
+        private void btnRefresh_Click(object? sender, EventArgs e)
         {
             txtSearch.Clear();
             LoadApplicants();
         }
 
-        // ================= SEARCH =================
-        private void btnSearch_Click(object sender, EventArgs e)
+
+        private void btnSearch_Click(object? sender, EventArgs e)
         {
-            db.OpenConnection();
+            try
+            {
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
 
-            string query = @"
-            SELECT * FROM vw_ApplicantListHR
-            WHERE ApplicantName LIKE @search";
+                string query = @"
+        SELECT *
+        FROM vw_ApplicationSummary
+        WHERE ApplicantName LIKE @search
+           OR JobTitle LIKE @search
+           OR CurrentStatus LIKE @search";
 
-            MySqlCommand cmd = new MySqlCommand(query, db.GetConnection());
-            cmd.Parameters.AddWithValue("@search", "%" + txtSearch.Text + "%");
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue(
+                    "@search",
+                    "%" + txtSearch.Text.Trim() + "%");
 
-            MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
-            dgvApplicants.DataSource = dt;
+                DataTable dt = new DataTable();
+                da.Fill(dt);
 
-            db.CloseConnection();
+                dgvApplicants.DataSource = dt;
+
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Search error: " + ex.Message);
+            }
         }
 
-        // ================= OPEN RESUME (FIXED ERROR) =================
-        private void btnOpenResume_Click(object sender, EventArgs e)
+
+        private void btnOpenResume_Click(object? sender, EventArgs e)
         {
-            if (dgvApplicants.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Select applicant first.");
-                return;
-            }
-
-            string path = dgvApplicants.SelectedRows[0]
-                .Cells["ResumeFilePath"].Value.ToString();
-
-            if (string.IsNullOrEmpty(path))
-            {
-                MessageBox.Show("No resume uploaded.");
-                return;
-            }
-
-            if (!File.Exists(path))
-            {
-                MessageBox.Show("File not found:\n" + path);
-                return;
-            }
-
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = path,
-                UseShellExecute = true
-            });
+            btnOpenResume.Enabled = false;
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void LogAudit(string action, string details)
+        {
+            try
+            {
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
+
+                string query = @"
+        INSERT INTO AuditTrail
+        (
+            ActorType,
+            ActorID,
+            Action,
+            TargetTable,
+            TargetID,
+            Details
+        )
+        VALUES
+        (
+            @ActorType,
+            @ActorID,
+            @Action,
+            'Applicants',
+            0,
+            @Details
+        )";
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                cmd.Parameters.AddWithValue("@ActorType", Session.RoleName);
+                cmd.Parameters.AddWithValue("@ActorID", Session.UserID);
+                cmd.Parameters.AddWithValue("@Action", action);
+                cmd.Parameters.AddWithValue("@Details", details);
+
+                cmd.ExecuteNonQuery();
+
+                conn.Close();
+            }
+            catch
+            {
+            }
+        }
+
+        private void btnViewDetails_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dgvApplicants.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show("Please select an applicant first.");
+                    return;
+                }
+
+                DataGridViewRow row = dgvApplicants.SelectedRows[0];
+
+                if (row.Cells["ApplicationID"].Value == null)
+                {
+                    MessageBox.Show("Invalid row selected.");
+                    return;
+                }
+
+
+                string applicationId = row.Cells["ApplicationID"].Value?.ToString() ?? "N/A";
+                string applicantName = row.Cells["ApplicantName"].Value?.ToString() ?? "N/A";
+                string jobTitle = row.Cells["JobTitle"].Value?.ToString() ?? "N/A";
+                string department = row.Cells["DepartmentName"].Value?.ToString() ?? "N/A";
+                string status = row.Cells["CurrentStatus"].Value?.ToString() ?? "N/A";
+                string submittedAt = row.Cells["SubmittedAt"].Value?.ToString() ?? "N/A";
+                string missingDocs = row.Cells["MissingDocCount"].Value?.ToString() ?? "0";
+
+ 
+                string details = $@"
+APPLICATION DETAILS
+
+Application ID: {applicationId}
+Applicant Name: {applicantName}
+Job Title: {jobTitle}
+Department: {department}
+
+Status: {status}
+Submitted At: {submittedAt}
+Missing Documents: {missingDocs}
+";
+
+                MessageBox.Show(details, "Applicant Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+                LogAudit(
+                    "VIEW_APPLICANT_DETAILS",
+                    "Viewed ApplicationID: " + applicationId
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading details: " + ex.Message);
+            }
+        }
+
+        private void btnClose_Click(object? sender, EventArgs e)
         {
             this.Close();
         }
+
+        
     }
 }
