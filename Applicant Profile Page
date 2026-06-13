@@ -1,0 +1,395 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MyProfileModule
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+        }
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Profile Saved Successfully!");
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Profile Updated Successfully!");
+        }
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }
+}
+
+
+#designer
+
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace MyProfileModule
+{
+    partial class Form1
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+
+        private Panel headerPanel;
+        private Label lblTitle;
+
+        private GroupBox grpPersonal;
+        private GroupBox grpContact;
+        private GroupBox grpEducation;
+        private GroupBox grpWork;
+
+        private TextBox txtFirstName;
+        private TextBox txtLastName;
+        private ComboBox cboGender;
+        private DateTimePicker dtpBirthDate;
+
+        private TextBox txtEmail;
+        private TextBox txtPhone;
+        private TextBox txtAddress;
+
+        private ComboBox cboEducation;
+        private TextBox txtSchool;
+        private TextBox txtYear;
+
+        private TextBox txtSkills;
+        private TextBox txtCompany;
+        private TextBox txtPosition;
+
+        private Button btnSave;
+        private Button btnUpdate;
+        private Button btnBack;
+
+        private void InitializeComponent()
+        {
+            this.headerPanel = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.grpPersonal = new System.Windows.Forms.GroupBox();
+            this.grpContact = new System.Windows.Forms.GroupBox();
+            this.grpEducation = new System.Windows.Forms.GroupBox();
+            this.grpWork = new System.Windows.Forms.GroupBox();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnUpdate = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.headerPanel.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // headerPanel
+            // 
+            this.headerPanel.BackColor = System.Drawing.Color.Thistle;
+            this.headerPanel.Controls.Add(this.lblTitle);
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Location = new System.Drawing.Point(0, 0);
+            this.headerPanel.Name = "headerPanel";
+            this.headerPanel.Size = new System.Drawing.Size(1000, 90);
+            this.headerPanel.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Georgia", 22F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(20, 22);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(344, 43);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Applicant Profile";
+            // 
+            // grpPersonal
+            // 
+            this.grpPersonal.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.grpPersonal.Font = new System.Drawing.Font("Palatino Linotype", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpPersonal.ForeColor = System.Drawing.Color.Thistle;
+            this.grpPersonal.Location = new System.Drawing.Point(20, 110);
+            this.grpPersonal.Name = "grpPersonal";
+            this.grpPersonal.Size = new System.Drawing.Size(430, 200);
+            this.grpPersonal.TabIndex = 1;
+            this.grpPersonal.TabStop = false;
+            this.grpPersonal.Text = "Personal Information";
+            Label lblFirstName = new Label();
+            lblFirstName.Text = "First Name:";
+            lblFirstName.Location = new Point(15, 35);
+
+            txtFirstName = new TextBox();
+            txtFirstName.Location = new Point(120, 30);
+            txtFirstName.Size = new Size(250, 25);
+
+            Label lblLastName = new Label();
+            lblLastName.Text = "Last Name:";
+            lblLastName.Location = new Point(15, 75);
+
+            txtLastName = new TextBox();
+            txtLastName.Location = new Point(120, 70);
+            txtLastName.Size = new Size(250, 25);
+
+            Label lblGender = new Label();
+            lblGender.Text = "Gender:";
+            lblGender.Location = new Point(15, 115);
+
+            cboGender = new ComboBox();
+            cboGender.Location = new Point(120, 110);
+            cboGender.Size = new Size(250, 25);
+            cboGender.Items.AddRange(new string[]
+            {
+                  "Male",
+                  "Female",
+                   "Other"
+            });
+
+            Label lblBirthDate = new Label();
+            lblBirthDate.Text = "Birth Date:";
+            lblBirthDate.Location = new Point(15, 155);
+
+            dtpBirthDate = new DateTimePicker();
+            dtpBirthDate.Location = new Point(120, 150);
+            dtpBirthDate.Size = new Size(250, 25);
+
+            grpPersonal.Controls.Add(lblFirstName);
+            grpPersonal.Controls.Add(txtFirstName);
+            grpPersonal.Controls.Add(lblLastName);
+            grpPersonal.Controls.Add(txtLastName);
+            grpPersonal.Controls.Add(lblGender);
+            grpPersonal.Controls.Add(cboGender);
+            grpPersonal.Controls.Add(lblBirthDate);
+            grpPersonal.Controls.Add(dtpBirthDate);
+
+            // 
+            // grpContact
+            // 
+            this.grpContact.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.grpContact.Font = new System.Drawing.Font("Palatino Linotype", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpContact.ForeColor = System.Drawing.Color.Thistle;
+            this.grpContact.Location = new System.Drawing.Point(480, 110);
+            this.grpContact.Name = "grpContact";
+            this.grpContact.Size = new System.Drawing.Size(430, 200);
+            this.grpContact.TabIndex = 2;
+            this.grpContact.TabStop = false;
+            this.grpContact.Text = "Contact Information";
+            Label lblEmail = new Label();
+            lblEmail.Text = "Email:";
+            lblEmail.Location = new Point(15, 35);
+
+            txtEmail = new TextBox();
+            txtEmail.Location = new Point(120, 30);
+            txtEmail.Size = new Size(250, 25);
+
+            Label lblPhone = new Label();
+            lblPhone.Text = "Phone:";
+            lblPhone.Location = new Point(15, 75);
+
+            txtPhone = new TextBox();
+            txtPhone.Location = new Point(120, 70);
+            txtPhone.Size = new Size(250, 25);
+
+            Label lblAddress = new Label();
+            lblAddress.Text = "Address:";
+            lblAddress.Location = new Point(15, 115);
+
+            txtAddress = new TextBox();
+            txtAddress.Location = new Point(120, 110);
+            txtAddress.Size = new Size(250, 50);
+            txtAddress.Multiline = true;
+
+            grpContact.Controls.Add(lblEmail);
+            grpContact.Controls.Add(txtEmail);
+            grpContact.Controls.Add(lblPhone);
+            grpContact.Controls.Add(txtPhone);
+            grpContact.Controls.Add(lblAddress);
+            grpContact.Controls.Add(txtAddress);
+            // 
+            // grpEducation
+            // 
+            this.grpEducation.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.grpEducation.Font = new System.Drawing.Font("Palatino Linotype", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpEducation.ForeColor = System.Drawing.Color.Thistle;
+            this.grpEducation.Location = new System.Drawing.Point(20, 330);
+            this.grpEducation.Name = "grpEducation";
+            this.grpEducation.Size = new System.Drawing.Size(430, 220);
+            this.grpEducation.TabIndex = 3;
+            this.grpEducation.TabStop = false;
+            this.grpEducation.Text = "Educational Background";
+            Label lblEducation = new Label();
+            lblEducation.Text = "Level:";
+            lblEducation.Location = new Point(15, 35);
+
+            cboEducation = new ComboBox();
+            cboEducation.Location = new Point(120, 30);
+            cboEducation.Size = new Size(250, 25);
+
+            cboEducation.Items.AddRange(new string[]
+            {
+               "High School",
+               "Senior High School",
+               "College",
+               "Master's Degree"
+            });
+
+            Label lblSchool = new Label();
+            lblSchool.Text = "School:";
+            lblSchool.Location = new Point(15, 80);
+
+            txtSchool = new TextBox();
+            txtSchool.Location = new Point(120, 75);
+            txtSchool.Size = new Size(250, 25);
+
+            Label lblYear = new Label();
+            lblYear.Text = "Year Graduated:";
+            lblYear.Location = new Point(15, 125);
+
+            txtYear = new TextBox();
+            txtYear.Location = new Point(120, 120);
+            txtYear.Size = new Size(250, 25);
+
+            grpEducation.Controls.Add(lblEducation);
+            grpEducation.Controls.Add(cboEducation);
+            grpEducation.Controls.Add(lblSchool);
+            grpEducation.Controls.Add(txtSchool);
+            grpEducation.Controls.Add(lblYear);
+            grpEducation.Controls.Add(txtYear);
+            // 
+            // grpWork
+            // 
+            this.grpWork.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.grpWork.Font = new System.Drawing.Font("Palatino Linotype", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.grpWork.ForeColor = System.Drawing.Color.Thistle;
+            this.grpWork.Location = new System.Drawing.Point(480, 330);
+            this.grpWork.Name = "grpWork";
+            this.grpWork.Size = new System.Drawing.Size(430, 220);
+            this.grpWork.TabIndex = 4;
+            this.grpWork.TabStop = false;
+            this.grpWork.Text = "Skills and Work Experience";
+            Label lblSkills = new Label();
+            lblSkills.Text = "Skills:";
+            lblSkills.Location = new Point(15, 35);
+
+            txtSkills = new TextBox();
+            txtSkills.Location = new Point(120, 30);
+            txtSkills.Size = new Size(250, 50);
+            txtSkills.Multiline = true;
+
+            Label lblCompany = new Label();
+            lblCompany.Text = "Company:";
+            lblCompany.Location = new Point(15, 95);
+
+            txtCompany = new TextBox();
+            txtCompany.Location = new Point(120, 90);
+            txtCompany.Size = new Size(250, 25);
+
+            Label lblPosition = new Label();
+            lblPosition.Text = "Position:";
+            lblPosition.Location = new Point(15, 135);
+
+            txtPosition = new TextBox();
+            txtPosition.Location = new Point(120, 130);
+            txtPosition.Size = new Size(250, 25);
+
+            grpWork.Controls.Add(lblSkills);
+            grpWork.Controls.Add(txtSkills);
+            grpWork.Controls.Add(lblCompany);
+            grpWork.Controls.Add(txtCompany);
+            grpWork.Controls.Add(lblPosition);
+            grpWork.Controls.Add(txtPosition);
+            // 
+            // btnSave
+            // 
+            this.btnSave.BackColor = System.Drawing.Color.Thistle;
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSave.ForeColor = System.Drawing.Color.White;
+            this.btnSave.Location = new System.Drawing.Point(250, 620);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(130, 40);
+            this.btnSave.TabIndex = 5;
+            this.btnSave.Text = "Save Profile";
+            this.btnSave.UseVisualStyleBackColor = false;
+            // 
+            // btnUpdate
+            // 
+            this.btnUpdate.BackColor = System.Drawing.Color.Thistle;
+            this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUpdate.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpdate.ForeColor = System.Drawing.Color.White;
+            this.btnUpdate.Location = new System.Drawing.Point(410, 620);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(130, 40);
+            this.btnUpdate.TabIndex = 6;
+            this.btnUpdate.Text = "Update";
+            this.btnUpdate.UseVisualStyleBackColor = false;
+            // 
+            // btnBack
+            // 
+            this.btnBack.BackColor = System.Drawing.Color.Thistle;
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBack.ForeColor = System.Drawing.Color.White;
+            this.btnBack.Location = new System.Drawing.Point(570, 620);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(130, 40);
+            this.btnBack.TabIndex = 7;
+            this.btnBack.Text = "Back";
+            this.btnBack.UseVisualStyleBackColor = false;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.LavenderBlush;
+            this.ClientSize = new System.Drawing.Size(1000, 707);
+            this.Controls.Add(this.headerPanel);
+            this.Controls.Add(this.grpPersonal);
+            this.Controls.Add(this.grpContact);
+            this.Controls.Add(this.grpEducation);
+            this.Controls.Add(this.grpWork);
+            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.btnUpdate);
+            this.Controls.Add(this.btnBack);
+            this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Form1";
+            this.headerPanel.ResumeLayout(false);
+            this.headerPanel.PerformLayout();
+            this.ResumeLayout(false);
+
+        }
+        #endregion
+    }
+}
