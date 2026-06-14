@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -423,8 +423,10 @@ namespace HRApplicantSystem
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-            HRDashboard dashboard =
-                new HRDashboard();
+            HRDashboard dashboard = new HRDashboard(
+                Session.UserID,
+                Session.RoleName,
+                Session.FullName);
 
             dashboard.Show();
 
