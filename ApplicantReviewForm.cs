@@ -35,8 +35,13 @@ namespace HRApplicantSystem
             cmbStatus.Items.Add("Shortlisted");
             cmbStatus.Items.Add("For Interview");
             cmbStatus.Items.Add("For Assessment");
-            cmbStatus.Items.Add("Accepted");
-            cmbStatus.Items.Add("Rejected");
+            cmbStatus.Items.Add("For Final Review");
+
+            if (Session.RoleName == Roles.HRManager || Session.RoleName == Roles.Admin)
+            {
+                cmbStatus.Items.Add("Accepted");
+                cmbStatus.Items.Add("Rejected");
+            }
 
             LoadApplicants();
         }
@@ -93,7 +98,7 @@ namespace HRApplicantSystem
                 row.Cells["CurrentStatus"].Value.ToString();
         }
 
-        // ================= SAVE REVIEW (WITH AUDIT + TRANSACTION) =================
+
         private void btnSaveReview_Click(object sender, EventArgs e)
         {
             if (selectedApplicationID == 0)
@@ -119,7 +124,7 @@ namespace HRApplicantSystem
 
                 try
                 {
-                    // ================= GET OLD STATUS =================
+
                     string oldStatus = "";
 
                     string getQuery = @"
@@ -134,7 +139,7 @@ namespace HRApplicantSystem
                     if (result != null)
                         oldStatus = result.ToString();
 
-                    // ================= UPDATE APPLICATION =================
+
                     string updateQuery = @"
                         UPDATE Applications
                         SET CurrentStatus = @status
@@ -145,7 +150,7 @@ namespace HRApplicantSystem
                     updateCmd.Parameters.AddWithValue("@id", selectedApplicationID);
                     updateCmd.ExecuteNonQuery();
 
-                    // ================= INSERT REVIEW =================
+
                     string reviewQuery = @"
                         INSERT INTO ApplicantReviews
                         (
@@ -162,14 +167,16 @@ namespace HRApplicantSystem
                             @reviewedBy
                         )";
 
-                    MySqlCommand reviewCmd = new MySqlCommand(reviewQuery, conn, transaction);
-                    reviewCmd.Parameters.AddWithValue("@app", selectedApplicationID);
-                    reviewCmd.Parameters.AddWithValue("@remarks", remarks);
-                    reviewCmd.Parameters.AddWithValue("@recommendation", cmbStatus.Text);
-                    reviewCmd.Parameters.AddWithValue("@reviewedBy", Session.UserID);
-                    reviewCmd.ExecuteNonQuery();
+                    MySqlCommand spCmd = new MySqlCommand("sp_ChangeApplicationStatus", conn, transaction);
+                    spCmd.CommandType = CommandType.StoredProcedure;
+                    spCmd.Parameters.AddWithValue("p_ApplicationID", selectedApplicationID);
+                    spCmd.Parameters.AddWithValue("p_NewStatus", cmbStatus.Text);
+                    spCmd.Parameters.AddWithValue("p_ChangedByType", Session.RoleName);
+                    spCmd.Parameters.AddWithValue("p_ChangedByID", Session.UserID);
+                    spCmd.Parameters.AddWithValue("p_Remarks", remarks);
+                    spCmd.ExecuteNonQuery();
 
-                    // ================= AUDIT TRAIL =================
+
                     string auditQuery = @"
                         INSERT INTO AuditTrail
                         (
@@ -200,7 +207,7 @@ namespace HRApplicantSystem
 
                     auditCmd.ExecuteNonQuery();
 
-                    // ================= COMMIT =================
+
                     transaction.Commit();
 
                     MessageBox.Show("Review Saved Successfully!",
@@ -219,7 +226,7 @@ namespace HRApplicantSystem
             }
         }
 
-        // ================= OTHER BUTTONS =================
+
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             LoadApplicants();
@@ -248,7 +255,7 @@ namespace HRApplicantSystem
             dgvApplicants.ClearSelection();
         }
 
-        // NAVIGATION BUTTONS
+
         private void btnScreening_Click(object sender, EventArgs e)
         {
             new ScreeningForm().ShowDialog();
