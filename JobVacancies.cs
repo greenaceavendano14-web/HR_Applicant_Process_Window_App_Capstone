@@ -1,4 +1,4 @@
-﻿using HRApplicantSystem.Database;
+using HRApplicantSystem.Database;
 using HRApplicantSystem.Models;
 using MySql.Data.MySqlClient;
 using System;
