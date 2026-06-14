@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="ApplicantDashboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ApplicantListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ApplicantReviewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ApplicationStatusForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="AuditTrailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ChangePasswordForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MyProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HRLoginform.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="InterviewEvaluationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="InterviewScheduleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="JobVacancies.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="JobVacancyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MyApplicationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MyDocumentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="RegistrationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScreeningForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HiringDecisionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HRDashboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UserManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
