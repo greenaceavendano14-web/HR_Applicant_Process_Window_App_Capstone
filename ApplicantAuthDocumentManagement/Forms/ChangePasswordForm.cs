@@ -1,17 +1,23 @@
-﻿using System;
-using System.Windows.Forms;
+using ApplicantSystem;
+using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
 using MySql.Data.MySqlClient;
+using System;
+using System.Data;
+using System.Windows.Forms;
+using HRApplicantSystem;
 
-namespace ApplicantAuthDocumentManagement.Forms
+namespace HRApplicantSystem
 {
     public partial class ChangePasswordForm : Form
     {
         private string currentLoggedInUserEmail;
 
-        public ChangePasswordForm(string emailPassedFromLogin)
+        public ChangePasswordForm()
         {
             InitializeComponent();
-            currentLoggedInUserEmail = emailPassedFromLogin;
+
+            currentLoggedInUserEmail = ApplicantSession.Email;
         }
 
         private void btnChange_Click(object sender, EventArgs e)
@@ -19,8 +25,8 @@ namespace ApplicantAuthDocumentManagement.Forms
             lblMessage.Text = "";
 
             if (string.IsNullOrWhiteSpace(txtOldPassword.Text) ||
-               string.IsNullOrWhiteSpace(txtNewPassword.Text) ||
-               string.IsNullOrWhiteSpace(txtConfirmNew.Text))
+                string.IsNullOrWhiteSpace(txtNewPassword.Text) ||
+                string.IsNullOrWhiteSpace(txtConfirmNew.Text))
             {
                 lblMessage.Text = "Please fill in all fields.";
                 lblMessage.Visible = true;
@@ -34,56 +40,109 @@ namespace ApplicantAuthDocumentManagement.Forms
                 return;
             }
 
-            string selectQuery = "SELECT PasswordHash FROM ApplicantAccounts WHERE Email = @Email AND IsActive = 1";
-            string updateQuery = "UPDATE ApplicantAccounts SET PasswordHash = @NewPassword WHERE Email = @Email";
-
             try
             {
-                using (MySqlConnection conn = DBConnection.GetConnection())
+                DbConnection db = new DbConnection();
+
+                using (MySqlConnection conn = db.GetConnection())
                 {
                     conn.Open();
 
-                    using (MySqlCommand selectCmd = new MySqlCommand(selectQuery, conn))
+                    string verifyQuery = @"
+            SELECT AccountID
+            FROM ApplicantAccounts
+            WHERE Email = @Email
+            AND PasswordHash = SHA2(@OldPassword,256)
+            AND IsActive = 1";
+
+                    using (MySqlCommand verifyCmd =
+                           new MySqlCommand(verifyQuery, conn))
                     {
-                        selectCmd.Parameters.AddWithValue("@Email", currentLoggedInUserEmail);
+                        verifyCmd.Parameters.AddWithValue(
+                            "@Email",
+                            currentLoggedInUserEmail);
 
-                        using (MySqlDataReader reader = selectCmd.ExecuteReader())
+                        verifyCmd.Parameters.AddWithValue(
+                            "@OldPassword",
+                            txtOldPassword.Text);
+
+                        object result = verifyCmd.ExecuteScalar();
+
+                        if (result == null)
                         {
-                            if (reader.Read())
-                            {
-                                string databasePassword = reader["PasswordHash"].ToString();
+                            lblMessage.Text =
+                                "Incorrect current password.";
 
-                                if (txtOldPassword.Text != databasePassword)
-                                {
-                                    lblMessage.Text = "Incorrect current password.";
-                                    lblMessage.Visible = true;
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                lblMessage.Text = "User account configuration error.";
-                                lblMessage.Visible = true;
-                                return;
-                            }
+                            lblMessage.Visible = true;
+                            return;
                         }
                     }
 
-                    using (MySqlCommand updateCmd = new MySqlCommand(updateQuery, conn))
+                    string updateQuery = @"
+            UPDATE ApplicantAccounts
+            SET PasswordHash = SHA2(@NewPassword,256)
+            WHERE Email = @Email";
+
+                    using (MySqlCommand updateCmd =
+                           new MySqlCommand(updateQuery, conn))
                     {
-                        updateCmd.Parameters.AddWithValue("@NewPassword", txtNewPassword.Text);
-                        updateCmd.Parameters.AddWithValue("@Email", currentLoggedInUserEmail);
+                        updateCmd.Parameters.AddWithValue(
+                            "@NewPassword",
+                            txtNewPassword.Text);
+
+                        updateCmd.Parameters.AddWithValue(
+                            "@Email",
+                            currentLoggedInUserEmail);
 
                         updateCmd.ExecuteNonQuery();
                     }
+
+                    string auditQuery = @"
+            INSERT INTO AuditTrail
+            (
+                ActorType,
+                ActorID,
+                Action,
+                Details
+            )
+            VALUES
+            (
+                'Applicant',
+                @ActorID,
+                'CHANGE_PASSWORD',
+                @Details
+            )";
+
+                    using (MySqlCommand auditCmd =
+                           new MySqlCommand(auditQuery, conn))
+                    {
+                        auditCmd.Parameters.AddWithValue(
+                            "@ActorID",
+                            ApplicantSession.ApplicantID);
+
+                        auditCmd.Parameters.AddWithValue(
+                            "@Details",
+                            "Applicant changed account password.");
+
+                        auditCmd.ExecuteNonQuery();
+                    }
                 }
 
-                MessageBox.Show("Password changed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    "Password changed successfully!",
+                    "Success",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database tracking error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message,
+                    "Database Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
