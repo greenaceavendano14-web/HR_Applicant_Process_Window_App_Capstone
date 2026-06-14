@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows.Forms;
+using ApplicantSystem;
+using HRApplicantSystem.Database;
 using MySql.Data.MySqlClient;
 
-namespace ApplicantAuthDocumentManagement.Forms
+namespace HRApplicantSystem
 {
     public partial class LoginForm : Form
     {
@@ -16,6 +16,7 @@ namespace ApplicantAuthDocumentManagement.Forms
         private void lblTitle_Click(object sender, EventArgs e) { }
         private void lblLogin_Click(object sender, EventArgs e) { }
         private void lblPassword_Click(object sender, EventArgs e) { }
+
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
@@ -35,52 +36,111 @@ namespace ApplicantAuthDocumentManagement.Forms
                 return;
             }
 
-            string query = @"
-                SELECT aa.AccountID, a.ApplicantID, aa.Email, a.FirstName, a.LastName 
-                FROM ApplicantAccounts aa
-                LEFT JOIN Applicants a ON aa.AccountID = a.AccountID
-                WHERE aa.Email = @Email AND aa.PasswordHash = @Password AND aa.IsActive = 1";
-
             try
             {
-                using (MySqlConnection conn = DBConnection.GetConnection())
+                DbConnection db = new DbConnection();
+
+                using (MySqlConnection conn = db.GetConnection())
                 {
+                    conn.Open();
+
+                    string query = @"
+            SELECT
+                aa.AccountID,
+                a.ApplicantID,
+                aa.Email,
+                a.FirstName,
+                a.LastName
+            FROM ApplicantAccounts aa
+            INNER JOIN Applicants a
+                ON aa.AccountID = a.AccountID
+            WHERE aa.Email = @Email
+            AND aa.PasswordHash = SHA2(@Password,256)
+            AND aa.IsActive = 1";
+
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
                         cmd.Parameters.AddWithValue("@Password", txtPassword.Text);
 
-                        conn.Open();
-
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                Session.AccountID = Convert.ToInt32(reader["AccountID"]);
-                                Session.ApplicantID = reader["ApplicantID"] != DBNull.Value ? Convert.ToInt32(reader["ApplicantID"]) : 0;
-                                Session.Email = reader["Email"].ToString();
-                                Session.FirstName = reader["FirstName"].ToString();
-                                Session.LastName = reader["LastName"].ToString();
+                                ApplicantSession.AccountID =
+                                    Convert.ToInt32(reader["AccountID"]);
 
-                                MessageBox.Show($"Welcome, {Session.FullName}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                ApplicantSession.ApplicantID =
+                                    Convert.ToInt32(reader["ApplicantID"]);
 
-                                ApplicantDashboard dashboard = new ApplicantDashboard();
+                                ApplicantSession.Email =
+                                    reader["Email"].ToString();
 
-                                dashboard.Show();
+                                ApplicantSession.FirstName =
+                                    reader["FirstName"].ToString();
 
-                                this.Hide();
+                                ApplicantSession.LastName =
+                                    reader["LastName"].ToString();
                             }
                             else
                             {
-                                lblError.Text = "Invalid email or password.";
+                                lblError.Text = "Invalid Email or Password.";
+                                return;
                             }
                         }
                     }
+
+                    string auditQuery = @"
+            INSERT INTO AuditTrail
+            (
+                ActorType,
+                ActorID,
+                Action,
+                Details
+            )
+            VALUES
+            (
+                'Applicant',
+                @ActorID,
+                'LOGIN',
+                @Details
+            )";
+
+                    using (MySqlCommand auditCmd =
+                           new MySqlCommand(auditQuery, conn))
+                    {
+                        auditCmd.Parameters.AddWithValue(
+                            "@ActorID",
+                            ApplicantSession.ApplicantID);
+
+                        auditCmd.Parameters.AddWithValue(
+                            "@Details",
+                            "Applicant logged in.");
+
+                        auditCmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show(
+                        "Welcome " + ApplicantSession.FullName + "!",
+                        "Login Successful",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    ApplicantDashboard dashboard =
+                        new ApplicantDashboard();
+
+                    dashboard.Show();
+
+                    this.Hide();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database connection error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message,
+                    "Database Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -119,7 +179,9 @@ namespace ApplicantAuthDocumentManagement.Forms
 
         private void btnHRLogin_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("HR Login Form coming soon!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            HRLoginForm hrLogin = new HRLoginForm();
+            this.Hide();
+            hrLogin.Show();
         }
     }
 }
