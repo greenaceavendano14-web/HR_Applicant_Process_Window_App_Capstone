@@ -30,7 +30,6 @@ namespace HRApplicantSystem
             LoadApplicants();
         }
 
-
         private void LoadApplicants()
         {
             try
@@ -59,13 +58,11 @@ namespace HRApplicantSystem
             }
         }
 
-
         private void btnRefresh_Click(object? sender, EventArgs e)
         {
             txtSearch.Clear();
             LoadApplicants();
         }
-
 
         private void btnSearch_Click(object? sender, EventArgs e)
         {
@@ -75,24 +72,21 @@ namespace HRApplicantSystem
                 conn.Open();
 
                 string query = @"
-        SELECT *
-        FROM vw_ApplicationSummary
-        WHERE ApplicantName LIKE @search
-           OR JobTitle LIKE @search
-           OR CurrentStatus LIKE @search";
+                    SELECT *
+                    FROM vw_ApplicationSummary
+                    WHERE ApplicantName  LIKE @search
+                       OR JobTitle       LIKE @search
+                       OR CurrentStatus  LIKE @search";
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue(
-                    "@search",
-                    "%" + txtSearch.Text.Trim() + "%");
+                    "@search", "%" + txtSearch.Text.Trim() + "%");
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
                 dgvApplicants.DataSource = dt;
-
                 conn.Close();
             }
             catch (Exception ex)
@@ -104,51 +98,136 @@ namespace HRApplicantSystem
 
         private void btnOpenResume_Click(object? sender, EventArgs e)
         {
-            btnOpenResume.Enabled = false;
-        }
 
-        private void LogAudit(string action, string details)
-        {
+            if (dgvApplicants.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(
+                    "Please select an applicant first.",
+                    "No Selection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            DataGridViewRow row = dgvApplicants.SelectedRows[0];
+
+            if (row.Cells["ApplicationID"].Value == null)
+            {
+                MessageBox.Show("Invalid row selected.");
+                return;
+            }
+
+            int applicationID = Convert.ToInt32(row.Cells["ApplicationID"].Value);
+            string applicantName = row.Cells["ApplicantName"].Value?.ToString() ?? "Applicant";
+
+
+            string filePath = "";
+
             try
             {
                 MySqlConnection conn = db.GetConnection();
                 conn.Open();
 
                 string query = @"
-        INSERT INTO AuditTrail
-        (
-            ActorType,
-            ActorID,
-            Action,
-            TargetTable,
-            TargetID,
-            Details
-        )
-        VALUES
-        (
-            @ActorType,
-            @ActorID,
-            @Action,
-            'Applicants',
-            0,
-            @Details
-        )";
+                    SELECT FilePath, FileName, SubmissionStatus
+                    FROM   ApplicantDocuments
+                    WHERE  ApplicationID      = @appID
+                      AND  RequirementTypeID  = 1
+                    LIMIT 1";
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@appID", applicationID);
 
-                cmd.Parameters.AddWithValue("@ActorType", Session.RoleName);
-                cmd.Parameters.AddWithValue("@ActorID", Session.UserID);
-                cmd.Parameters.AddWithValue("@Action", action);
-                cmd.Parameters.AddWithValue("@Details", details);
+                MySqlDataReader reader = cmd.ExecuteReader();
 
-                cmd.ExecuteNonQuery();
+                if (reader.Read())
+                {
+                    string status = reader["SubmissionStatus"]?.ToString() ?? "Missing";
 
+
+                    if (status != "Submitted")
+                    {
+                        reader.Close();
+                        conn.Close();
+                        MessageBox.Show(
+                            applicantName + " has not submitted a resume yet.\n" +
+                            "Document status: " + status,
+                            "Resume Not Available",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    filePath = reader["FilePath"]?.ToString() ?? "";
+                }
+                else
+                {
+
+                    reader.Close();
+                    conn.Close();
+                    MessageBox.Show(
+                        "No resume record found for " + applicantName + ".",
+                        "Resume Not Found",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                reader.Close();
                 conn.Close();
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show("Database error: " + ex.Message);
+                return;
+            }
+
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                MessageBox.Show(
+                    "Resume path is empty in the database.",
+                    "Resume Not Found",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show(
+                    "Resume file could not be found at:\n" + filePath + "\n\n" +
+                    "The file may have been moved or deleted.",
+                    "File Not Found",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true   // lets Windows pick the right app
+                });
+
+
+                LogAudit(
+                    "OPEN_RESUME",
+                    "Opened resume for ApplicationID: " + applicationID +
+                    " | Applicant: " + applicantName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Could not open the file:\n" + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
+
 
         private void btnViewDetails_Click(object sender, EventArgs e)
         {
@@ -168,7 +247,6 @@ namespace HRApplicantSystem
                     return;
                 }
 
-
                 string applicationId = row.Cells["ApplicationID"].Value?.ToString() ?? "N/A";
                 string applicantName = row.Cells["ApplicantName"].Value?.ToString() ?? "N/A";
                 string jobTitle = row.Cells["JobTitle"].Value?.ToString() ?? "N/A";
@@ -177,27 +255,25 @@ namespace HRApplicantSystem
                 string submittedAt = row.Cells["SubmittedAt"].Value?.ToString() ?? "N/A";
                 string missingDocs = row.Cells["MissingDocCount"].Value?.ToString() ?? "0";
 
- 
                 string details = $@"
 APPLICATION DETAILS
 
-Application ID: {applicationId}
-Applicant Name: {applicantName}
-Job Title: {jobTitle}
-Department: {department}
+Application ID  : {applicationId}
+Applicant Name  : {applicantName}
+Job Title       : {jobTitle}
+Department      : {department}
 
-Status: {status}
-Submitted At: {submittedAt}
+Status          : {status}
+Submitted At    : {submittedAt}
 Missing Documents: {missingDocs}
 ";
 
-                MessageBox.Show(details, "Applicant Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                MessageBox.Show(details, "Applicant Details",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 LogAudit(
                     "VIEW_APPLICANT_DETAILS",
-                    "Viewed ApplicationID: " + applicationId
-                );
+                    "Viewed ApplicationID: " + applicationId);
             }
             catch (Exception ex)
             {
@@ -205,11 +281,37 @@ Missing Documents: {missingDocs}
             }
         }
 
+        private void LogAudit(string action, string details)
+        {
+            try
+            {
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO AuditTrail
+                    (ActorType, ActorID, Action, TargetTable, TargetID, Details)
+                    VALUES
+                    (@ActorType, @ActorID, @Action, 'Applicants', 0, @Details)";
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@ActorType", Session.RoleName);
+                cmd.Parameters.AddWithValue("@ActorID", Session.UserID);
+                cmd.Parameters.AddWithValue("@Action", action);
+                cmd.Parameters.AddWithValue("@Details", details);
+
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+            catch
+            {
+                // Audit failures should never crash the main flow
+            }
+        }
+
         private void btnClose_Click(object? sender, EventArgs e)
         {
             this.Close();
         }
-
-        
     }
 }
