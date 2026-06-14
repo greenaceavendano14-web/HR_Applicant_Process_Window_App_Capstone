@@ -1,4 +1,4 @@
-﻿namespace HRApplicationFormVieww
+namespace HRApplicantSystem
 {
     partial class ApplicantReviewForm
     {
@@ -28,249 +28,292 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtSearch = new System.Windows.Forms.TextBox();
-            this.btnSearch = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.dgvApplicants = new System.Windows.Forms.DataGridView();
-            this.Label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.txtApplicant = new System.Windows.Forms.TextBox();
-            this.txtJob = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.cmbStatus = new System.Windows.Forms.ComboBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.txtRemarks = new System.Windows.Forms.TextBox();
-            this.btnSaveReview = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.btnClear = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
-            this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvApplicants)).BeginInit();
-            this.SuspendLayout();
+            panel1 = new Panel();
+            label1 = new Label();
+            label2 = new Label();
+            txtSearch = new TextBox();
+            btnSearch = new Button();
+            panel2 = new Panel();
+            label3 = new Label();
+            dgvApplicants = new DataGridView();
+            Label4 = new Label();
+            label5 = new Label();
+            txtApplicant = new TextBox();
+            txtJob = new TextBox();
+            label6 = new Label();
+            cmbStatus = new ComboBox();
+            label7 = new Label();
+            txtRemarks = new TextBox();
+            btnSaveReview = new Button();
+            btnRefresh = new Button();
+            btnClear = new Button();
+            btnClose = new Button();
+            btnScreening = new Button();
+            Scheduling = new Button();
+            btnEvaluation = new Button();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvApplicants).BeginInit();
+            SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Thistle;
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1174, 100);
-            this.panel1.TabIndex = 0;
+            panel1.BackColor = Color.Thistle;
+            panel1.Controls.Add(label1);
+            panel1.Location = new Point(10, 11);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(1027, 94);
+            panel1.TabIndex = 0;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(456, 33);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(263, 28);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "APPLICANT REVIEW FORM";
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.Location = new Point(399, 31);
+            label1.Name = "label1";
+            label1.Size = new Size(210, 21);
+            label1.TabIndex = 1;
+            label1.Text = "APPLICANT REVIEW FORM";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Lucida Fax", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(12, 149);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(140, 17);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Search Applicant:";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
+            label2.AutoSize = true;
+            label2.Font = new Font("Lucida Fax", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.Location = new Point(10, 140);
+            label2.Name = "label2";
+            label2.Size = new Size(116, 15);
+            label2.TabIndex = 1;
+            label2.Text = "Search Applicant:";
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(169, 149);
-            this.txtSearch.Multiline = true;
-            this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(151, 31);
-            this.txtSearch.TabIndex = 2;
+            txtSearch.Location = new Point(148, 140);
+            txtSearch.Multiline = true;
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(133, 29);
+            txtSearch.TabIndex = 2;
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(358, 149);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(97, 31);
-            this.btnSearch.TabIndex = 3;
-            this.btnSearch.Text = "Search";
-            this.btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Location = new Point(313, 140);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(85, 29);
+            btnSearch.TabIndex = 3;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.Thistle;
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Location = new System.Drawing.Point(12, 211);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1174, 100);
-            this.panel2.TabIndex = 2;
+            panel2.BackColor = Color.Thistle;
+            panel2.Controls.Add(label3);
+            panel2.Location = new Point(10, 198);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(1027, 94);
+            panel2.TabIndex = 2;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(497, 33);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(165, 28);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "APPLICANT LIST";
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label3.Location = new Point(435, 31);
+            label3.Name = "label3";
+            label3.Size = new Size(132, 21);
+            label3.TabIndex = 1;
+            label3.Text = "APPLICANT LIST";
             // 
             // dgvApplicants
             // 
-            this.dgvApplicants.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvApplicants.Location = new System.Drawing.Point(15, 342);
-            this.dgvApplicants.Name = "dgvApplicants";
-            this.dgvApplicants.RowHeadersWidth = 51;
-            this.dgvApplicants.RowTemplate.Height = 24;
-            this.dgvApplicants.Size = new System.Drawing.Size(1171, 229);
-            this.dgvApplicants.TabIndex = 4;
+            dgvApplicants.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvApplicants.Location = new Point(13, 321);
+            dgvApplicants.Name = "dgvApplicants";
+            dgvApplicants.RowHeadersWidth = 51;
+            dgvApplicants.RowTemplate.Height = 24;
+            dgvApplicants.Size = new Size(1025, 215);
+            dgvApplicants.TabIndex = 4;
             // 
             // Label4
             // 
-            this.Label4.AutoSize = true;
-            this.Label4.Font = new System.Drawing.Font("Lucida Fax", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label4.Location = new System.Drawing.Point(12, 614);
-            this.Label4.Name = "Label4";
-            this.Label4.Size = new System.Drawing.Size(133, 17);
-            this.Label4.TabIndex = 5;
-            this.Label4.Text = "Applicant Name:";
+            Label4.AutoSize = true;
+            Label4.Font = new Font("Lucida Fax", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Label4.Location = new Point(10, 576);
+            Label4.Name = "Label4";
+            Label4.Size = new Size(110, 15);
+            Label4.TabIndex = 5;
+            Label4.Text = "Applicant Name:";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Lucida Fax", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(355, 614);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(116, 17);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "Applicant Job:";
-            this.label5.Click += new System.EventHandler(this.label5_Click);
+            label5.AutoSize = true;
+            label5.Font = new Font("Lucida Fax", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label5.Location = new Point(311, 576);
+            label5.Name = "label5";
+            label5.Size = new Size(96, 15);
+            label5.TabIndex = 6;
+            label5.Text = "Applicant Job:";
             // 
             // txtApplicant
             // 
-            this.txtApplicant.Location = new System.Drawing.Point(151, 614);
-            this.txtApplicant.Name = "txtApplicant";
-            this.txtApplicant.Size = new System.Drawing.Size(169, 22);
-            this.txtApplicant.TabIndex = 7;
+            txtApplicant.Location = new Point(132, 576);
+            txtApplicant.Name = "txtApplicant";
+            txtApplicant.Size = new Size(148, 23);
+            txtApplicant.TabIndex = 7;
             // 
             // txtJob
             // 
-            this.txtJob.Location = new System.Drawing.Point(477, 614);
-            this.txtJob.Name = "txtJob";
-            this.txtJob.Size = new System.Drawing.Size(169, 22);
-            this.txtJob.TabIndex = 8;
+            txtJob.Location = new Point(417, 576);
+            txtJob.Name = "txtJob";
+            txtJob.Size = new Size(148, 23);
+            txtJob.TabIndex = 8;
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Lucida Fax", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(687, 616);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(172, 17);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "Current / New Status:";
-            this.label6.Click += new System.EventHandler(this.label6_Click);
+            label6.AutoSize = true;
+            label6.Font = new Font("Lucida Fax", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label6.Location = new Point(601, 578);
+            label6.Name = "label6";
+            label6.Size = new Size(139, 15);
+            label6.TabIndex = 9;
+            label6.Text = "Current / New Status:";
             // 
             // cmbStatus
             // 
-            this.cmbStatus.FormattingEnabled = true;
-            this.cmbStatus.Location = new System.Drawing.Point(882, 612);
-            this.cmbStatus.Name = "cmbStatus";
-            this.cmbStatus.Size = new System.Drawing.Size(149, 24);
-            this.cmbStatus.TabIndex = 10;
+            cmbStatus.FormattingEnabled = true;
+            cmbStatus.Location = new Point(772, 574);
+            cmbStatus.Name = "cmbStatus";
+            cmbStatus.Size = new Size(131, 23);
+            cmbStatus.TabIndex = 10;
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Lucida Fax", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(28, 670);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(78, 17);
-            this.label7.TabIndex = 11;
-            this.label7.Text = "Remarks:";
+            label7.AutoSize = true;
+            label7.Font = new Font("Lucida Fax", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label7.Location = new Point(24, 628);
+            label7.Name = "label7";
+            label7.Size = new Size(63, 15);
+            label7.TabIndex = 11;
+            label7.Text = "Remarks:";
             // 
             // txtRemarks
             // 
-            this.txtRemarks.Location = new System.Drawing.Point(31, 709);
-            this.txtRemarks.Multiline = true;
-            this.txtRemarks.Name = "txtRemarks";
-            this.txtRemarks.Size = new System.Drawing.Size(355, 153);
-            this.txtRemarks.TabIndex = 12;
+            txtRemarks.Location = new Point(27, 665);
+            txtRemarks.Multiline = true;
+            txtRemarks.Name = "txtRemarks";
+            txtRemarks.Size = new Size(311, 144);
+            txtRemarks.TabIndex = 12;
             // 
             // btnSaveReview
             // 
-            this.btnSaveReview.Location = new System.Drawing.Point(31, 921);
-            this.btnSaveReview.Name = "btnSaveReview";
-            this.btnSaveReview.Size = new System.Drawing.Size(114, 23);
-            this.btnSaveReview.TabIndex = 13;
-            this.btnSaveReview.Text = "Save Review";
-            this.btnSaveReview.UseVisualStyleBackColor = true;
+            btnSaveReview.Location = new Point(27, 863);
+            btnSaveReview.Name = "btnSaveReview";
+            btnSaveReview.Size = new Size(100, 22);
+            btnSaveReview.TabIndex = 13;
+            btnSaveReview.Text = "Save Review";
+            btnSaveReview.UseVisualStyleBackColor = true;
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(183, 921);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(114, 23);
-            this.btnRefresh.TabIndex = 14;
-            this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = true;
+            btnRefresh.Location = new Point(160, 863);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(100, 22);
+            btnRefresh.TabIndex = 14;
+            btnRefresh.Text = "Refresh";
+            btnRefresh.UseVisualStyleBackColor = true;
             // 
             // btnClear
             // 
-            this.btnClear.Location = new System.Drawing.Point(341, 921);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(114, 23);
-            this.btnClear.TabIndex = 15;
-            this.btnClear.Text = "Clear";
-            this.btnClear.UseVisualStyleBackColor = true;
+            btnClear.Location = new Point(298, 863);
+            btnClear.Name = "btnClear";
+            btnClear.Size = new Size(100, 22);
+            btnClear.TabIndex = 15;
+            btnClear.Text = "Clear";
+            btnClear.UseVisualStyleBackColor = true;
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(492, 921);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(114, 23);
-            this.btnClose.TabIndex = 16;
-            this.btnClose.Text = "Close";
-            this.btnClose.UseVisualStyleBackColor = true;
+            btnClose.Location = new Point(430, 863);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(100, 22);
+            btnClose.TabIndex = 16;
+            btnClose.Text = "Close";
+            btnClose.UseVisualStyleBackColor = true;
+            // 
+            // btnScreening
+            // 
+            btnScreening.Font = new Font("Segoe UI", 13F, FontStyle.Bold);
+            btnScreening.ForeColor = Color.Black;
+            btnScreening.Location = new Point(490, 645);
+            btnScreening.Name = "btnScreening";
+            btnScreening.Size = new Size(150, 40);
+            btnScreening.TabIndex = 17;
+            btnScreening.Text = "Screening";
+            btnScreening.UseVisualStyleBackColor = true;
+            btnScreening.Click += btnScreening_Click;
+            // 
+            // Scheduling
+            // 
+            Scheduling.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            Scheduling.ForeColor = Color.Black;
+            Scheduling.Location = new Point(670, 640);
+            Scheduling.Name = "Scheduling";
+            Scheduling.Size = new Size(150, 50);
+            Scheduling.TabIndex = 19;
+            Scheduling.Text = "Interview \r\nScheduling";
+            Scheduling.UseVisualStyleBackColor = true;
+            Scheduling.Click += Scheduling_Click;
+            // 
+            // btnEvaluation
+            // 
+            btnEvaluation.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnEvaluation.ForeColor = Color.Black;
+            btnEvaluation.Location = new Point(850, 640);
+            btnEvaluation.Name = "btnEvaluation";
+            btnEvaluation.Size = new Size(150, 50);
+            btnEvaluation.TabIndex = 20;
+            btnEvaluation.Text = "Interview \r\nEvaluation";
+            btnEvaluation.UseVisualStyleBackColor = true;
+            btnEvaluation.Click += btnEvaluation_Click;
             // 
             // ApplicantReviewForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.LavenderBlush;
-            this.ClientSize = new System.Drawing.Size(1198, 1055);
-            this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.btnClear);
-            this.Controls.Add(this.btnRefresh);
-            this.Controls.Add(this.btnSaveReview);
-            this.Controls.Add(this.txtRemarks);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.cmbStatus);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.txtJob);
-            this.Controls.Add(this.txtApplicant);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.Label4);
-            this.Controls.Add(this.dgvApplicants);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.btnSearch);
-            this.Controls.Add(this.txtSearch);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.panel1);
-            this.Name = "ApplicantReviewForm";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvApplicants)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            AutoScroll = true;
+            AutoScrollMinSize = new Size(0, 950);
+            BackColor = Color.LavenderBlush;
+            ClientSize = new Size(1084, 701);
+            Controls.Add(btnEvaluation);
+            Controls.Add(Scheduling);
+            Controls.Add(btnScreening);
+            Controls.Add(btnClose);
+            Controls.Add(btnClear);
+            Controls.Add(btnRefresh);
+            Controls.Add(btnSaveReview);
+            Controls.Add(txtRemarks);
+            Controls.Add(label7);
+            Controls.Add(cmbStatus);
+            Controls.Add(label6);
+            Controls.Add(txtJob);
+            Controls.Add(txtApplicant);
+            Controls.Add(label5);
+            Controls.Add(Label4);
+            Controls.Add(dgvApplicants);
+            Controls.Add(panel2);
+            Controls.Add(btnSearch);
+            Controls.Add(txtSearch);
+            Controls.Add(label2);
+            Controls.Add(panel1);
+            MinimizeBox = false;
+            Name = "ApplicantReviewForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Form1";
+            Load += Form1_Load;
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvApplicants).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -296,6 +339,9 @@
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Button btnClose;
+        private Button btnScreening;
+        private Button Scheduling;
+        private Button btnEvaluation;
     }
 }
 
