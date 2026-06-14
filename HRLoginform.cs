@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using HRApplicantSystem.Database;
@@ -15,7 +15,7 @@ namespace HRApplicantSystem
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void HRLoginForm_Load(object sender, EventArgs e)
         {
             txtPassword.PasswordChar = '*';
         }
@@ -25,8 +25,7 @@ namespace HRApplicantSystem
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(email) ||
-                string.IsNullOrWhiteSpace(password))
+            if (email == "" || password == "")
             {
                 MessageBox.Show(
                     "Please enter email and password.",
@@ -36,7 +35,6 @@ namespace HRApplicantSystem
 
                 return;
             }
-
 
             try
             {
@@ -60,45 +58,51 @@ namespace HRApplicantSystem
                     AND U.IsActive = 1
                     LIMIT 1";
 
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    MySqlCommand cmd =
+                        new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@Password", password);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", password);
-
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        if (!reader.Read())
                         {
-                            if (!reader.Read())
-                            {
-                                MessageBox.Show(
-                                    "Invalid Email or Password",
-                                    "Login Failed",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
+                            MessageBox.Show(
+                                "Invalid Email or Password.",
+                                "Login Failed",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
 
-                                return;
-                            }
+                            return;
+                        }
 
-                            int userId =
-                                Convert.ToInt32(reader["UserID"]);
+                        int userId =
+                            Convert.ToInt32(reader["UserID"]);
 
-                            string role =
-                                reader["RoleName"].ToString();
+                        string firstName =
+                            reader["FirstName"].ToString();
 
-                            string fullName =
-                                reader["FirstName"].ToString() + " " +
-                                reader["LastName"].ToString();
+                        string lastName =
+                            reader["LastName"].ToString();
 
-                            reader.Close();
+                        string role =
+    reader["RoleName"]?.ToString() ?? "";
 
-                            Session.UserID = userId;
-                            Session.FullName = fullName;
-                            Session.RoleName = role;
+                        string fullName =
+                            (firstName ?? "") + " " + (lastName ?? "");
 
-                        
+                        Session.UserID = userId;
+                        Session.FullName = fullName;
+                        Session.RoleName = role;
 
-                            MySqlCommand auditCmd =
-                                new MySqlCommand(@"
-                            INSERT INTO AuditTrail
+                        reader.Close();
+
+                        string actorType = role;
+
+                        MySqlCommand auditCmd =
+                            new MySqlCommand(
+                            @"INSERT INTO AuditTrail
                             (
                                 ActorType,
                                 ActorID,
@@ -106,44 +110,55 @@ namespace HRApplicantSystem
                                 TargetTable,
                                 TargetID,
                                 Details
-                                )
-                                VALUES
-                                (
+                            )
+                            VALUES
+                            (
                                 @ActorType,
                                 @ActorID,
                                 'LOGIN',
-                                @TargetTable,
+                                'Users',
                                 @TargetID,
                                 @Details
-                                )", conn);                                                                
-    
-    
-                            auditCmd.Parameters.AddWithValue("@ActorType", role);
-                            auditCmd.Parameters.AddWithValue("@ActorID", userId);
-                            auditCmd.Parameters.AddWithValue("@TargetTable", "Users");
-                            auditCmd.Parameters.AddWithValue("@TargetID", userId);
-                            auditCmd.Parameters.AddWithValue("@Details", fullName + " logged in.");
-                            auditCmd.ExecuteNonQuery();
-  
+                            )", conn);
 
-                            HRDashboard dashboard =
-                                new HRDashboard(
-                                    userId,
-                                    role,
-                                    fullName);
+                        auditCmd.Parameters.AddWithValue(
+                            "@ActorType", actorType);
 
-                            dashboard.Show();
+                        auditCmd.Parameters.AddWithValue(
+                            "@ActorID", userId);
 
-                            this.Hide();
-                        }
+                        auditCmd.Parameters.AddWithValue(
+                            "@TargetID", userId);
+
+                        auditCmd.Parameters.AddWithValue(
+                            "@Details",
+                            fullName + " logged in.");
+
+                        auditCmd.ExecuteNonQuery();
+
+                        MessageBox.Show(
+                            "Login Successful!",
+                            "Success",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
+                        HRDashboard dashboard =
+                            new HRDashboard(
+                                userId,
+                                role,
+                                fullName);
+
+                        dashboard.Show();
+
+                        this.Hide();
                     }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    ex.Message,
-                    "Database Error",
+                    "Database Error:\n\n" + ex.Message,
+                    "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
@@ -161,8 +176,15 @@ namespace HRApplicantSystem
             {
                 txtPassword.PasswordChar = '\0';
                 passwordVisible = true;
-                btnShowPassword.Text = "✖";
+                btnShowPassword.Text = "🙈";
             }
+        }
+
+        private void btnApplicantLogIn_Click(object sender, EventArgs e)
+        {
+            LoginForm applicantLogin = new LoginForm();
+            applicantLogin.Show();
+            this.Close();
         }
     }
 }
