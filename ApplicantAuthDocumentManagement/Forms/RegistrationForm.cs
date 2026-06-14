@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using HRApplicantSystem.Database;
 
-namespace ApplicantAuthDocumentManagement.Forms
+namespace HRApplicantSystem
 {
     public partial class RegistrationForm : Form
     {
@@ -16,7 +17,6 @@ namespace ApplicantAuthDocumentManagement.Forms
 
         private void btnRegister_Click(object sender, EventArgs e)
         {
-
             lblMessage.Text = "";
 
             if (string.IsNullOrWhiteSpace(txtFirstName.Text) ||
@@ -34,31 +34,40 @@ namespace ApplicantAuthDocumentManagement.Forms
             {
                 lblMessage.ForeColor = Color.Red;
                 lblMessage.Text = "Passwords do not match.";
-                txtConfirmPassword.Focus();
                 return;
             }
 
-            if (!txtEmail.Text.Contains("@") || !txtEmail.Text.Contains("."))
+            if (!txtEmail.Text.Contains("@"))
             {
                 lblMessage.ForeColor = Color.Red;
-                lblMessage.Text = "Please enter a valid email address.";
-                txtEmail.Focus();
+                lblMessage.Text = "Invalid Email Address.";
                 return;
             }
 
             try
             {
-                using (MySqlConnection conn = DBConnection.GetConnection())
+                DbConnection db = new DbConnection();
+
+                using (MySqlConnection conn = db.GetConnection())
                 {
-                    string checkQuery = "SELECT COUNT(*) FROM ApplicantAccounts WHERE Email = @Email";
-                    using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
+                    conn.Open();
+
+                    string checkQuery =
+                    @"SELECT COUNT(*)
+              FROM ApplicantAccounts
+              WHERE Email=@Email";
+
+                    using (MySqlCommand checkCmd =
+                           new MySqlCommand(checkQuery, conn))
                     {
-                        checkCmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
+                        checkCmd.Parameters.AddWithValue(
+                            "@Email",
+                            txtEmail.Text.Trim());
 
-                        conn.Open();
-                        int emailConflictCount = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        int count =
+                            Convert.ToInt32(checkCmd.ExecuteScalar());
 
-                        if (emailConflictCount > 0)
+                        if (count > 0)
                         {
                             lblMessage.ForeColor = Color.Red;
                             lblMessage.Text = "Email already exists.";
@@ -66,43 +75,129 @@ namespace ApplicantAuthDocumentManagement.Forms
                         }
                     }
 
-                    string insertQuery = @"
-                        INSERT INTO ApplicantAccounts (Email, PasswordHash, IsActive) 
-                        VALUES (@Email, @Password, 1);
-                        SELECT LAST_INSERT_ID();";
+                    string accountQuery = @"
+            INSERT INTO ApplicantAccounts
+            (
+                Email,
+                PasswordHash,
+                IsActive
+            )
+            VALUES
+            (
+                @Email,
+                SHA2(@Password,256),
+                1
+            );
+
+            SELECT LAST_INSERT_ID();";
 
                     int newAccountID = 0;
-                    using (MySqlCommand insertCmd = new MySqlCommand(insertQuery, conn))
-                    {
-                        insertCmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
-                        insertCmd.Parameters.AddWithValue("@Password", txtPassword.Text); // Matches clear-text strategy from login
 
-                        newAccountID = Convert.ToInt32(insertCmd.ExecuteScalar());
+                    using (MySqlCommand accountCmd =
+                           new MySqlCommand(accountQuery, conn))
+                    {
+                        accountCmd.Parameters.AddWithValue(
+                            "@Email",
+                            txtEmail.Text.Trim());
+
+                        accountCmd.Parameters.AddWithValue(
+                            "@Password",
+                            txtPassword.Text);
+
+                        newAccountID =
+                            Convert.ToInt32(accountCmd.ExecuteScalar());
                     }
 
-                    string profileQuery = "INSERT INTO Applicants (AccountID, FirstName, LastName) VALUES (@AccountID, @FirstName, @LastName)";
-                    using (MySqlCommand profileCmd = new MySqlCommand(profileQuery, conn))
-                    {
-                        profileCmd.Parameters.AddWithValue("@AccountID", newAccountID);
-                        profileCmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
-                        profileCmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
+                    string applicantQuery = @"
+            INSERT INTO Applicants
+            (
+                AccountID,
+                FirstName,
+                LastName
+            )
+            VALUES
+            (
+                @AccountID,
+                @FirstName,
+                @LastName
+            )";
 
-                        profileCmd.ExecuteNonQuery();
+                    using (MySqlCommand applicantCmd =
+                           new MySqlCommand(applicantQuery, conn))
+                    {
+                        applicantCmd.Parameters.AddWithValue(
+                            "@AccountID",
+                            newAccountID);
+
+                        applicantCmd.Parameters.AddWithValue(
+                            "@FirstName",
+                            txtFirstName.Text.Trim());
+
+                        applicantCmd.Parameters.AddWithValue(
+                            "@LastName",
+                            txtLastName.Text.Trim());
+
+                        applicantCmd.ExecuteNonQuery();
                     }
 
-                    lblMessage.ForeColor = Color.Green;
-                    lblMessage.Text = "Account created! You can now login.";
+                    string auditQuery = @"
+            INSERT INTO AuditTrail
+            (
+                ActorType,
+                ActorID,
+                Action,
+                TargetTable,
+                TargetID,
+                Details
+            )
+            VALUES
+            (
+                'Applicant',
+                @ActorID,
+                'REGISTER',
+                'ApplicantAccounts',
+                @TargetID,
+                @Details
+            )";
 
-                    txtFirstName.Clear();
-                    txtLastName.Clear();
-                    txtEmail.Clear();
-                    txtPassword.Clear();
-                    txtConfirmPassword.Clear();
+                    using (MySqlCommand auditCmd =
+                           new MySqlCommand(auditQuery, conn))
+                    {
+                        auditCmd.Parameters.AddWithValue(
+                            "@ActorID",
+                            newAccountID);
+
+                        auditCmd.Parameters.AddWithValue(
+                            "@TargetID",
+                            newAccountID);
+
+                        auditCmd.Parameters.AddWithValue(
+                            "@Details",
+                            "New applicant registered.");
+
+                        auditCmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show(
+                        "Registration Successful!",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    LoginForm login = new LoginForm();
+
+                    login.Show();
+
+                    this.Hide();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Database tracking error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message,
+                    "Database Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
