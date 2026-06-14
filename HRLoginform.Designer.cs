@@ -44,6 +44,7 @@ namespace HRApplicantSystem
             txtEmail = new TextBox();
             Email = new Label();
             LogIn = new Label();
+            btnApplicantLogIn = new Button();
             panelHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogo).BeginInit();
             panelLogIn.SuspendLayout();
@@ -173,12 +174,26 @@ namespace HRApplicantSystem
             LogIn.TabIndex = 0;
             LogIn.Text = "HR LOGIN";
             // 
+            // btnApplicantLogIn
+            // 
+            btnApplicantLogIn.FlatAppearance.BorderSize = 0;
+            btnApplicantLogIn.FlatStyle = FlatStyle.Flat;
+            btnApplicantLogIn.Font = new Font("Segoe UI", 10F);
+            btnApplicantLogIn.Location = new Point(715, 519);
+            btnApplicantLogIn.Name = "btnApplicantLogIn";
+            btnApplicantLogIn.Size = new Size(115, 30);
+            btnApplicantLogIn.TabIndex = 2;
+            btnApplicantLogIn.Text = "Applicant Login";
+            btnApplicantLogIn.UseVisualStyleBackColor = true;
+            btnApplicantLogIn.Click += btnApplicantLogIn_Click;
+            // 
             // HRLoginForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LavenderBlush;
             ClientSize = new Size(884, 561);
+            Controls.Add(btnApplicantLogIn);
             Controls.Add(panelLogIn);
             Controls.Add(panelHeader);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -187,7 +202,6 @@ namespace HRApplicantSystem
             StartPosition = FormStartPosition.CenterScreen;
             Text = "HR Login";
             WindowState = FormWindowState.Minimized;
-            Load += Form1_Load;
             panelHeader.ResumeLayout(false);
             panelHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogo).EndInit();
@@ -209,5 +223,6 @@ namespace HRApplicantSystem
         private TextBox txtPassword;
         private PictureBox pictureBoxLogo;
         private Button btnShowPassword;
+        private Button btnApplicantLogIn;
     }
 }
