@@ -1,14 +1,17 @@
-﻿using MySql.Data.MySqlClient;
+using HRApplicantSystem.Database;
+using HRApplicantSystem.Models;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace HRInterviewEvaluationForm
+namespace HRApplicantSystem
 {
     public partial class InterviewEvaluationForm : Form
     {
-        DBConnection db = new DBConnection();
+        DbConnection db = new DbConnection();
 
+        int selectedScheduleID = 0;
         int selectedApplicationID = 0;
 
         public InterviewEvaluationForm()
@@ -23,6 +26,7 @@ namespace HRInterviewEvaluationForm
             btnRefresh.Click += btnRefresh_Click;
             btnClear.Click += btnClear_Click;
             btnClose.Click += btnClose_Click;
+            btnSearch.Click += btnSearch_Click;
 
             numCommunication.ValueChanged += CalculateScore;
             numTechnical.ValueChanged += CalculateScore;
@@ -30,7 +34,7 @@ namespace HRInterviewEvaluationForm
             numProblemSolving.ValueChanged += CalculateScore;
         }
 
-        // ================= LOAD FORM =================
+        // ================= LOAD =================
         private void InterviewEvaluationForm_Load(object sender, EventArgs e)
         {
             cmbRecommendation.Items.Clear();
@@ -38,36 +42,52 @@ namespace HRInterviewEvaluationForm
             cmbRecommendation.Items.Add("Reject");
             cmbRecommendation.Items.Add("For Final Review");
 
-            LoadApplicants();
+            this.WindowState = FormWindowState.Maximized;
+
+            LoadSchedules();
             CalculateScore(null, null);
         }
 
         // ================= LOAD DATA =================
-        private void LoadApplicants()
+        private void LoadSchedules(string search = "")
         {
             try
             {
-                db.OpenConnection();
-
                 string query = @"
                 SELECT
+                    s.ScheduleID,
                     a.ApplicationID,
                     CONCAT(ap.FirstName,' ',ap.LastName) AS ApplicantName,
                     j.JobTitle,
-                    a.CurrentStatus
-                FROM Applications a
+                    s.ScheduledDate,
+                    s.Status
+                FROM InterviewSchedules s
+                INNER JOIN Applications a ON s.ApplicationID = a.ApplicationID
                 INNER JOIN Applicants ap ON a.ApplicantID = ap.ApplicantID
-                INNER JOIN JobVacancies j ON a.VacancyID = j.VacancyID";
+                INNER JOIN JobVacancies j ON a.VacancyID = j.VacancyID
+                WHERE s.Status = 'Scheduled'";
 
-                MySqlDataAdapter da =
-                    new MySqlDataAdapter(query, db.GetConnection());
+                if (!string.IsNullOrEmpty(search))
+                {
+                    query += @" AND CONCAT(ap.FirstName,' ',ap.LastName)
+                               LIKE @search";
+                }
 
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                if (!string.IsNullOrEmpty(search))
+                    cmd.Parameters.AddWithValue("@search", "%" + search + "%");
+
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
                 dgvInterview.DataSource = dt;
 
-                db.CloseConnection();
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -75,12 +95,15 @@ namespace HRInterviewEvaluationForm
             }
         }
 
-        // ================= SELECT APPLICANT =================
+        // ================= SELECT =================
         private void dgvInterview_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
             DataGridViewRow row = dgvInterview.Rows[e.RowIndex];
+
+            selectedScheduleID =
+                Convert.ToInt32(row.Cells["ScheduleID"].Value);
 
             selectedApplicationID =
                 Convert.ToInt32(row.Cells["ApplicationID"].Value);
@@ -92,7 +115,7 @@ namespace HRInterviewEvaluationForm
                 row.Cells["JobTitle"].Value.ToString();
         }
 
-        // ================= AUTO CALCULATE SCORE =================
+        // ================= SCORE =================
         private void CalculateScore(object sender, EventArgs e)
         {
             double total =
@@ -111,45 +134,94 @@ namespace HRInterviewEvaluationForm
         {
             try
             {
-                if (selectedApplicationID == 0)
+                if (selectedScheduleID == 0)
                 {
-                    MessageBox.Show("Select an applicant first.");
+                    MessageBox.Show("Select an interview schedule.");
                     return;
                 }
 
-                db.OpenConnection();
+                if (cmbRecommendation.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Select recommendation.");
+                    return;
+                }
 
-                double overall =
-                    (double.Parse(lblOverall.Text));
+                MySqlConnection conn = db.GetConnection();
+                conn.Open();
 
+                double score = double.Parse(lblOverall.Text);
+
+                string result = "Pending";
+
+                if (cmbRecommendation.Text == "Hire")
+                    result = "Pass";
+                else if (cmbRecommendation.Text == "Reject")
+                    result = "Fail";
+
+                // ================= INSERT EVALUATION =================
                 string insert = @"
                 INSERT INTO InterviewEvaluations
-                (ApplicationID, Communication, Technical, Confidence,
-                 ProblemSolving, OverallRating, Recommendation,
-                 Remarks, InterviewDate, EvaluatedBy)
+                (
+                    ScheduleID,
+                    EvaluatedByUserID,
+                    Score,
+                    Result,
+                    Remarks,
+                    Recommendation
+                )
                 VALUES
-                (@app,@c,@t,@co,@p,@o,@r,@rm,@d,'HR Staff')";
+                (
+                    @schedule,
+                    @user,
+                    @score,
+                    @result,
+                    @remarks,
+                    @rec
+                )";
 
-                MySqlCommand cmd =
-                    new MySqlCommand(insert, db.GetConnection());
-
-                cmd.Parameters.AddWithValue("@app", selectedApplicationID);
-                cmd.Parameters.AddWithValue("@c", numCommunication.Value);
-                cmd.Parameters.AddWithValue("@t", numTechnical.Value);
-                cmd.Parameters.AddWithValue("@co", numConfidence.Value);
-                cmd.Parameters.AddWithValue("@p", numProblemSolving.Value);
-                cmd.Parameters.AddWithValue("@o", overall);
-                cmd.Parameters.AddWithValue("@r", cmbRecommendation.Text);
-                cmd.Parameters.AddWithValue("@rm", txtRemarks.Text);
-                cmd.Parameters.AddWithValue("@d", dtpInterviewDate.Value.Date);
+                MySqlCommand cmd = new MySqlCommand(insert, conn);
+                cmd.Parameters.AddWithValue("@schedule", selectedScheduleID);
+                cmd.Parameters.AddWithValue("@user", Session.UserID);
+                cmd.Parameters.AddWithValue("@score", score);
+                cmd.Parameters.AddWithValue("@result", result);
+                cmd.Parameters.AddWithValue("@remarks", txtRemarks.Text);
+                cmd.Parameters.AddWithValue("@rec", cmbRecommendation.Text);
 
                 cmd.ExecuteNonQuery();
 
-                db.CloseConnection();
+                // ================= UPDATE SCHEDULE =================
+                string updateSched = @"
+                UPDATE InterviewSchedules
+                SET Status='Completed'
+                WHERE ScheduleID=@id";
 
-                MessageBox.Show("Interview Evaluation Saved!");
+                MySqlCommand up = new MySqlCommand(updateSched, conn);
+                up.Parameters.AddWithValue("@id", selectedScheduleID);
+                up.ExecuteNonQuery();
 
-                LoadApplicants();
+                // ================= UPDATE APPLICATION STATUS =================
+                string newStatus = "For Final Review";
+
+                if (cmbRecommendation.Text == "Hire")
+                    newStatus = "Accepted";
+                else if (cmbRecommendation.Text == "Reject")
+                    newStatus = "Rejected";
+
+                string updateApp = @"
+                UPDATE Applications
+                SET CurrentStatus=@status
+                WHERE ApplicationID=@id";
+
+                MySqlCommand upApp = new MySqlCommand(updateApp, conn);
+                upApp.Parameters.AddWithValue("@status", newStatus);
+                upApp.Parameters.AddWithValue("@id", selectedApplicationID);
+                upApp.ExecuteNonQuery();
+
+                conn.Close();
+
+                MessageBox.Show("Evaluation saved successfully!");
+
+                LoadSchedules();
                 ClearFields();
             }
             catch (Exception ex)
@@ -158,10 +230,16 @@ namespace HRInterviewEvaluationForm
             }
         }
 
+        // ================= SEARCH =================
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            LoadSchedules(txtSearch.Text.Trim());
+        }
+
         // ================= REFRESH =================
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            LoadApplicants();
+            LoadSchedules();
         }
 
         // ================= CLEAR =================
@@ -184,7 +262,9 @@ namespace HRInterviewEvaluationForm
             cmbRecommendation.SelectedIndex = -1;
             lblOverall.Text = "0.00";
 
+            selectedScheduleID = 0;
             selectedApplicationID = 0;
+
             dgvInterview.ClearSelection();
         }
 
