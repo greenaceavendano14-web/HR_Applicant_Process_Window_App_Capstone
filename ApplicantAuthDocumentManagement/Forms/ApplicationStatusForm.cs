@@ -1,132 +1,221 @@
-﻿using System;
+using ApplicantSystem;
+using HRApplicantSystem.Database;
+using MySql.Data.MySqlClient;
+using System;
 using System.Data;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
-namespace ApplicantAuthDocumentManagement.Forms
+namespace HRApplicantSystem
 {
     public partial class ApplicationStatusForm : Form
     {
-        private int currentApplicantID = Session.ApplicantID;
+        private int currentApplicantID;
 
         public ApplicationStatusForm()
         {
             InitializeComponent();
 
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            currentApplicantID = ApplicantSession.ApplicantID;
+
+            btnRefresh.Click += btnRefresh_Click;
+            this.Load += ApplicationStatusForm_Load;
         }
 
         private void ApplicationStatusForm_Load(object sender, EventArgs e)
         {
-            FetchAndRenderApplicationStatus();
-            FixUiLayoutIssues();
+            LoadApplicationStatus();
         }
 
-        private void btnRefresh_Click(object sender, EventArgs e)
+        private void LoadApplicationStatus()
         {
-            FetchAndRenderApplicationStatus();
-            MessageBox.Show("Your application timeline records have been successfully updated live!", "Status Synchronized", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        /// <summary>
-        /// Simple method to clean up visual bugs, handle parent panel containment, and ensure maximum contrast readability
-        /// </summary>
-        private void FixUiLayoutIssues()
-        {
-            if (this.Controls.Contains(lblSectionTitle))
+            try
             {
-                this.Controls.Remove(lblSectionTitle);
-                pnlHeader.Controls.Add(lblSectionTitle);
+                DbConnection db = new DbConnection();
 
-                lblSectionTitle.Location = new System.Drawing.Point(630, 25);
-            }
-
-            lblSectionTitle.ForeColor = System.Drawing.Color.White;
-        }
-
-        /// <summary>
-        /// Central tracking routine managing database connections to extract job info and historical progress logs
-        /// </summary>
-        private void FetchAndRenderApplicationStatus()
-        {
-            string overviewQuery = @"
-                SELECT JobTitle, CurrentStatus 
-                FROM Applications 
-                WHERE ApplicantID = @AppID 
-                LIMIT 1;";
-
-            string timelineQuery = @"
-                SELECT NewStatus AS 'Recruitment Stage Phase', 
-                       Remarks AS 'HR Operations Review Notes', 
-                       ChangedAt AS 'Action Date & Timestamp'
-                FROM ApplicationStatusHistory
-                WHERE ApplicationID = (SELECT ApplicationID FROM Applications WHERE ApplicantID = @AppID LIMIT 1)
-                ORDER BY ChangedAt DESC;";
-
-            using (MySqlConnection conn = DBConnection.GetConnection())
-            {
-                try
+                using (MySqlConnection conn = db.GetConnection())
                 {
                     conn.Open();
 
-                    using (MySqlCommand cmdOverview = new MySqlCommand(overviewQuery, conn))
+                    string applicationQuery = @"
+                    SELECT
+                        A.ApplicationID,
+                        J.JobTitle,
+                        A.CurrentStatus
+                    FROM Applications A
+                    INNER JOIN JobVacancies J
+                        ON A.VacancyID = J.VacancyID
+                    WHERE A.ApplicantID = @ApplicantID
+                    ORDER BY A.ApplicationID DESC
+                    LIMIT 1";
+
+                    MySqlCommand cmd =
+                        new MySqlCommand(applicationQuery, conn);
+
+                    cmd.Parameters.AddWithValue(
+                        "@ApplicantID",
+                        currentApplicantID);
+
+                    int applicationID = 0;
+
+                    using (MySqlDataReader reader =
+                        cmd.ExecuteReader())
                     {
-                        cmdOverview.Parameters.AddWithValue("@AppID", currentApplicantID);
-
-                        using (MySqlDataReader reader = cmdOverview.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                lblJobTitle.Text = "Applying For: " + reader["JobTitle"].ToString();
-                                lblCurrentStatus.Text = reader["CurrentStatus"].ToString().ToUpper();
-                            }
-                            else
-                            {
-                                lblJobTitle.Text = "Applying For: No Active Job Request Found";
-                                lblCurrentStatus.Text = "NOT INITIALIZED";
-                            }
-                        }
-                    }
+                            applicationID =
+                                Convert.ToInt32(
+                                    reader["ApplicationID"]);
 
-                    using (MySqlCommand cmdTimeline = new MySqlCommand(timelineQuery, conn))
-                    {
-                        cmdTimeline.Parameters.AddWithValue("@AppID", currentApplicantID);
+                            lblJobTitle.Text =
+                                "Applying For: " +
+                                reader["JobTitle"].ToString();
 
-                        MySqlDataAdapter adapter = new MySqlDataAdapter(cmdTimeline);
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
-
-                        dgvTimeline.DataSource = dt;
-
-                        dgvTimeline.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-                        if (dt.Rows.Count > 0)
-                        {
-                            string latestRemarkText = dt.Rows[0]["HR Operations Review Notes"].ToString();
-
-                            if (string.IsNullOrWhiteSpace(latestRemarkText))
-                            {
-                                txtRemarks.Text = "Your application request is currently processing. Administrative summary remarks box left blank.";
-                            }
-                            else
-                            {
-                                txtRemarks.Text = latestRemarkText;
-                            }
+                            lblCurrentStatus.Text =
+                                reader["CurrentStatus"].ToString();
                         }
                         else
                         {
-                            txtRemarks.Text = "Your application form is currently in queue. No administrative analysis entries written yet.";
+                            lblJobTitle.Text =
+                                "Applying For: No Application Found";
+
+                            lblCurrentStatus.Text =
+                                "No Status Available";
+
+                            dgvTimeline.DataSource = null;
+
+                            txtRemarks.Text =
+                                "No application records found.";
+
+                            return;
                         }
                     }
+
+                    string timelineQuery = @"
+                    SELECT
+                        NewStatus AS 'Status',
+                        Remarks AS 'Remarks',
+                        ChangedAt AS 'Date'
+                    FROM ApplicationStatusHistory
+                    WHERE ApplicationID = @ApplicationID
+                    ORDER BY ChangedAt DESC";
+
+                    MySqlCommand timelineCmd =
+                        new MySqlCommand(
+                            timelineQuery,
+                            conn);
+
+                    timelineCmd.Parameters.AddWithValue(
+                        "@ApplicationID",
+                        applicationID);
+
+                    MySqlDataAdapter da =
+                        new MySqlDataAdapter(timelineCmd);
+
+                    DataTable dt =
+                        new DataTable();
+
+                    da.Fill(dt);
+
+                    dgvTimeline.DataSource = dt;
+
+                    dgvTimeline.AutoSizeColumnsMode =
+                        DataGridViewAutoSizeColumnsMode.Fill;
+
+                    dgvTimeline.ReadOnly = true;
+
+                    dgvTimeline.AllowUserToAddRows = false;
+
+                    dgvTimeline.AllowUserToDeleteRows = false;
+
+                    dgvTimeline.SelectionMode =
+                        DataGridViewSelectionMode.FullRowSelect;
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        txtRemarks.Text =
+                            dt.Rows[0]["Remarks"]
+                            .ToString();
+                    }
+                    else
+                    {
+                        txtRemarks.Text =
+                            "No status history available.";
+                    }
+
+                    LogStatusView();
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error communicating with timeline server: " + ex.Message, "Database Communication Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Database Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
-        private void pnlMainContent_Paint(object sender, PaintEventArgs e)
+        private void LogStatusView()
+        {
+            try
+            {
+                DbConnection db = new DbConnection();
+
+                using (MySqlConnection conn = db.GetConnection())
+                {
+                    conn.Open();
+
+                    string query = @"
+                    INSERT INTO AuditTrail
+                    (
+                        ActorType,
+                        ActorID,
+                        Action,
+                        Details
+                    )
+                    VALUES
+                    (
+                        'Applicant',
+                        @ActorID,
+                        'VIEW_STATUS',
+                        @Details
+                    )";
+
+                    MySqlCommand cmd =
+                        new MySqlCommand(query, conn);
+
+                    cmd.Parameters.AddWithValue(
+                        "@ActorID",
+                        ApplicantSession.ApplicantID);
+
+                    cmd.Parameters.AddWithValue(
+                        "@Details",
+                        "Applicant viewed application status.");
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void btnRefresh_Click(
+            object sender,
+            EventArgs e)
+        {
+            LoadApplicationStatus();
+
+            MessageBox.Show(
+                "Application status refreshed successfully.",
+                "Refresh",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        private void pnlMainContent_Paint(
+            object sender,
+            PaintEventArgs e)
         {
 
         }
